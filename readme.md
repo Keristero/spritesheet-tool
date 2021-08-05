@@ -5,6 +5,7 @@ copy paste images into the web page
 1. add button to delete input sheets ✅
 1. allow adding, removing, and selection of animation states ✅
 1. add current bounding box to selected animation state ✅
+1. super duper refactor
 1. add per frame OR entire animation settings
     1. duration
     1. anchor
