@@ -1,0 +1,22 @@
+body{
+    background-color: rgb(238, 238, 238);
+    display:grid;
+    gap: 1em;
+}
+#settings{
+    grid-column: 1;
+    grid-row: 1;
+}
+#drag_and_drop_zone{
+    grid-column: 1;
+    grid-row: 2;
+}
+#preview_zone{
+    grid-column: 2;
+    grid-row: 2;
+}
+
+div{
+    border-style: solid;
+    border-color:black;
+}
