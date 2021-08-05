@@ -1,4 +1,6 @@
 <head>
+    <script src="./CanvasContainer.js"></script>
+    <script src="./AnimationCanvasContainer.js"></script>
     <script src="./InputCanvasContainer.js"></script>
     <script src="./main.js" defer></script>
     <link rel="stylesheet" href="style.css"></style>
@@ -6,9 +8,10 @@
 <body>
     <div class="cell" id="settings">
         <p>Selection Radius<input type=number value=1 id="inp_selection_radius"></input></p>
+        <p><button id="btn_add_state">Add Animation State</button></p>
     </div>
     <div class="cell" id="input_zone"></div>
-    <div class="cell" id="preview_zone">
+    <div class="cell" id="states_zone">
         <canvas id="output_preview_canvas"></canvas>
     </div>
 </body>

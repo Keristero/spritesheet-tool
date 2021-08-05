@@ -1,57 +1,86 @@
-class InputCanvasContainer{
+class InputCanvasContainer extends CanvasContainer{
     constructor(image){
-        this.element = document.createElement('div')
-        this.canvas = document.createElement('canvas')
-        this.element.appendChild(this.canvas)
-        this.ctx = this.canvas.getContext('2d')
+        super()
         this.image = image
         this.canvas.width = image.width
         this.canvas.height = image.height
-        this.ctx.drawImage(this.image,0,0)
-        this.AddMouseEvents()
-        this.hover_pos={x:0,y:0}
-        this.has_hover = false
-        this.done_lost_hover_draw = false
+        this.FillImage()
+        this.AddControlsPane()
+        this.GetDefaultTransparentColor()
     }
-    AddMouseEvents(){
-        this.canvas.addEventListener('mousemove',(e)=>{
-            let x = e.offsetX
-            let y = e.offsetY
-            this.hover_pos.x = x
-            this.hover_pos.y = y
-        })
-        this.canvas.onmouseover = (e)=>{
-            this.has_hover = true
+    AddControlsPane(){
+        this.div_settings = document.createElement('div')
+        this.element.appendChild(this.div_settings)
+
+        let p_transparent_color = document.createElement('p')
+        p_transparent_color.textContent = "Transparency Color (set with scroll click)"
+        this.div_settings.appendChild(p_transparent_color)
+        this.div_transparent_color = document.createElement('div')
+        this.div_transparent_color.style.backgroundColor = "rgba(255,0,0,0)"
+        p_transparent_color.appendChild(this.div_transparent_color)
+
+        let btn_delete_sheet = document.createElement('button')
+        btn_delete_sheet.textContent = "Remove Input Sheet"
+        btn_delete_sheet.onclick = ()=>{this.DeleteSelf()}
+        this.div_settings.appendChild(btn_delete_sheet)
+    }
+    FillImage(){
+        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
+        this.ctx.drawImage(this.image,0,0)
+    }
+    SetTransparentColor(new_color){
+        this.transparent_color = new_color
+        this.div_transparent_color.style.backgroundColor = `rgba(${this.transparent_color})`
+        this.div_transparent_color.textContent = this.transparent_color
+        console.log(this.transparent_color)
+    }
+    GetDefaultTransparentColor(){
+        let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
+        let pixel_color = getPixel(image_data,0,0)
+        this.SetTransparentColor(pixel_color)
+    }
+    ButtonPress(e){
+        if(e.button == 0){
+            //left click
+            this.FillImage()
+            if(this.bounds && point_in_bounds(this.hover_pos.x,this.hover_pos.y,this.bounds)){
+                AddFrameToSelectedState(this.canvas,this.bounds)
+            }else{
+                this.FindBoundingBox()
+            }
+        }else if(e.button == 1){
+            //middle click
+            this.FillImage()
+            let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
+            let pixel_color = getPixel(image_data,this.hover_pos.x,this.hover_pos.y)
+            this.SetTransparentColor(pixel_color)
         }
-        this.canvas.onmouseout = (e)=>{
-            this.has_hover = false
-            this.done_lost_hover_draw = false
-        }
-        this.canvas.addEventListener('mouseup',(e)=>{
-            this.FindBoundingBox()
-        })
     }
     Draw(){
-        if(this.has_hover || !this.done_lost_hover_draw){
-            this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
-            this.ctx.drawImage(this.image,0,0)
-            this.ctx.lineWidth = 0.5
-            if(this.bounds){
-                this.ctx.fillStyle = 'rgba(0,0,255,0.1)'
-                let {minX,minY,maxX,maxY} = this.bounds
-                this.ctx.fillRect(minX,minY,(maxX-minX)+1,(maxY-minY)+1)
-            }
-            this.done_lost_hover_draw = true
+        this.FillImage()
+        this.ctx.lineWidth = 0.5
+        if(this.bounds){
+            this.ctx.fillStyle = 'rgba(0,0,255,0.1)'
+            let {minX,minY,maxX,maxY} = this.bounds
+            this.ctx.fillRect(minX,minY,(maxX-minX)+1,(maxY-minY)+1)
         }
     }
     FindBoundingBox(){
-        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
-        this.ctx.drawImage(this.image,0,0)
+        this.FillImage()
         let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
         let {x,y} = this.hover_pos
-        this.bounds = find_transparent_bounding_box(image_data,x,y,this.canvas.width,this.canvas.height,inp_selection_radius.value)
+        this.bounds = find_transparent_bounding_box(image_data,x,y,this.canvas.width,this.canvas.height,inp_selection_radius.value,this.transparent_color)
         console.log(this.bounds)
     }
+}
+
+function point_in_bounds(x,y,bounds){
+    console.log(x,y,bounds)
+    let {minX,minY,maxX,maxY} = bounds
+    if(x >= minX && x <=maxX && y >= minY && y <= maxY){
+        return true
+    }
+    return false
 }
 
 function find_transparent_bounding_box(image_data,startX,startY,image_width,image_height,max_distance=1,transparent_color=[0,0,0,0]){
