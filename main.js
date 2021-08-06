@@ -10,6 +10,7 @@ const input_canvas_containers = [];
 const animation_states = [];
 const inp_selection_radius = document.getElementById("inp_selection_radius");
 const btn_add_state = document.getElementById("btn_add_state");
+const keyboard = new Keyboard()
 let selected_animation_state = null;
 
 function SelectAnimationState(animation_state) {

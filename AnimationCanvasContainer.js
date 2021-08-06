@@ -12,7 +12,7 @@ class AnimationCanvasContainer extends CanvasContainer{
         this.state_name = ""
         this.selected = false
         this.frames = []
-        this.selected_frame_index = null
+        this.selected_frames = []
         this.RenderSelectedFrameProps()
     }
     Select(){
@@ -54,29 +54,33 @@ class AnimationCanvasContainer extends CanvasContainer{
         this.canvas.width = this.GetWidestFrameWidth()
         this.canvas.height = this.GetTallestFrameHeight()
         canvas.onclick = ()=>{
+            if(!keyboard.CtrlIsHeld()){
+                this.ClearFrameSelection()
+            }
             this.SelectFrame(canvas)
         }
         this.ResetAnimation()
     }
-    SelectFrame(canvas){
-        if(canvas){
-            for(let frame of this.frames){
-                frame.classList.remove("selected")
-            }
-            this.selected_frame_index = this.frames.indexOf(canvas)
-            canvas.classList.add("selected")
-        }else{
-            this.selected_frame_index = null
+    ClearFrameSelection(){
+        this.selected_frames = []
+        for(let frame of this.frames){
+            frame.classList.remove("selected")
         }
+    }
+    SelectFrame(canvas){
+        if(!canvas || this.selected_frames.indexOf(canvas) >= 0){
+            return
+        }
+        this.selected_frames.push(canvas)
+        canvas.classList.add("selected")
         this.RenderSelectedFrameProps()
     }
     RenderSelectedFrameProps(){
-        if(this.selected_frame_index !== null){
-            let canvas = this.frames[this.selected_frame_index]
-            this.p_frame_props.textContent = JSON.stringify(canvas.props)
+        this.div_frame_settings.classList.add("hidden")
+        this.p_frame_props.textContent = ""
+        for(let canvas of this.selected_frames){
+            this.p_frame_props.textContent += JSON.stringify(canvas.props)
             this.div_frame_settings.classList.remove("hidden")
-        }else{
-            this.div_frame_settings.classList.add("hidden")
         }
     }
     GetTallestFrameHeight(){
@@ -127,7 +131,7 @@ class AnimationCanvasContainer extends CanvasContainer{
         }
     }
     DrawIfRequired(){
-        if(this.preview && this.preview.needs_redraw){
+        if(this.frames.length > 0 && this.preview && this.preview.needs_redraw){
             this.Draw()
         }
     }
@@ -229,23 +233,20 @@ class AnimationCanvasContainer extends CanvasContainer{
         let btn_remove_frame = create_and_append_element('button',this.div_frame_settings)
         btn_remove_frame.textContent = "Remove Frame"
         btn_remove_frame.onclick = ()=>{
-            if(this.selected_frame_index !== null){
-                let frame_canvas = this.frames[this.selected_frame_index]
-                this.frames.splice(this.selected_frame_index,1)
+            for(let frame_canvas of this.selected_frames){
+                this.frames.splice(this.frames.indexOf(frame_canvas),1)
                 this.element.removeChild(frame_canvas)
-                this.SelectFrame(null)
+                this.ClearFrameSelection()
             }
         }
 
         let btn_apply_settings_to_frame = create_and_append_element('button',this.div_frame_settings)
         btn_apply_settings_to_frame.textContent = "Apply Settings To Frame"
         btn_apply_settings_to_frame.onclick = ()=>{
-            if(this.selected_frame_index !== null){
-                let frame_canvas = this.frames[this.selected_frame_index]
-                //frame_canvas.props.duration = parseFloat(inp_frame_duration.value)
+            for(let frame_canvas of this.selected_frames){
                 this.ApplyPropsToFrame(this.default_props,frame_canvas)
-                this.RenderSelectedFrameProps()
             }
+            this.RenderSelectedFrameProps()
         }
 
         this.p_frame_props = create_and_append_element('p',this.div_frame_settings)
