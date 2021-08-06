@@ -22,11 +22,11 @@ function SelectAnimationState(animation_state) {
     selected_animation_state = animation_state;
 }
 
-function AddFrameToSelectedState(source_image, source_bounds) {
+function AddFrameToSelectedState(source_image, source_bounds,anchor_pos) {
     if (!selected_animation_state) {
         return;
     }
-    selected_animation_state.AddFrame(source_image,source_bounds)
+    selected_animation_state.AddFrame(source_image,source_bounds,anchor_pos)
 }
 
 btn_add_state.onclick = () => {
@@ -38,7 +38,7 @@ btn_add_state.onclick = () => {
         SelectAnimationState(null)
         states_zone.removeChild(animation_state_container.element);
     };
-    SelectAnimationState()
+    SelectAnimationState(animation_state_container)
 };
 
 window.addEventListener("paste", async (clipboard_event) => {

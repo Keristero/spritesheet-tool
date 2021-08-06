@@ -1,12 +1,19 @@
 class AnimationCanvasContainer extends CanvasContainer{
     constructor(image){
         super()
+        this.default_props = {
+            duration:100,
+            flip_x:false,
+            flip_y:false,
+            anchor_x:0,
+            anchor_y:0
+        }
         this.AddControlsPane()
         this.state_name = ""
         this.selected = false
         this.frames = []
         this.selected_frame_index = null
-        this.default_frame_duration = 0.2
+        this.RenderSelectedFrameProps()
     }
     Select(){
         this.element.style.backgroundColor = "rgba(0,255,0,0.1)"
@@ -16,7 +23,7 @@ class AnimationCanvasContainer extends CanvasContainer{
         this.element.style.backgroundColor = "rgba(0,0,0,0)"
         this.selected = false
     }
-    AddFrame(source_image,source_bounds){
+    AddFrame(source_image,source_bounds,anchor_pos){
         let {minX, minY, maxX, maxY} = source_bounds
         let canvas = document.createElement('canvas')
         let width = maxX-minX
@@ -25,18 +32,31 @@ class AnimationCanvasContainer extends CanvasContainer{
         canvas.height = height
         let ctx = canvas.getContext('2d')
         ctx.drawImage(source_image,minX,minY,width,height,0,0,width,height)
+        let local_anchor_pos = {
+            x:this.default_props.anchor_x,
+            y:this.default_props.anchor_y
+        }
+        if(anchor_pos){
+            local_anchor_pos.x = anchor_pos.x-minX
+            local_anchor_pos.y = anchor_pos.y-minY
+        }
         //set frame properties
         canvas.props = {
-            duration:this.default_frame_duration
+            duration:this.default_props.duration,
+            flip_x:this.default_props.flip_x,
+            flip_y:this.default_props.flip_y,
+            anchor_x:local_anchor_pos.x,
+            anchor_y:local_anchor_pos.y
         }
         this.frames.push(canvas)
         this.element.appendChild(canvas)
         console.log('adding frame',canvas.width)
-        this.canvas.width = this.GetWidestFrame()
-        this.canvas.height = this.GetMaxHeight()
+        this.canvas.width = this.GetWidestFrameWidth()
+        this.canvas.height = this.GetTallestFrameHeight()
         canvas.onclick = ()=>{
             this.SelectFrame(canvas)
         }
+        this.ResetAnimation()
     }
     SelectFrame(canvas){
         if(canvas){
@@ -44,17 +64,46 @@ class AnimationCanvasContainer extends CanvasContainer{
                 frame.classList.remove("selected")
             }
             this.selected_frame_index = this.frames.indexOf(canvas)
-            this.p_frame_props.textContent = JSON.stringify(canvas.props)
             canvas.classList.add("selected")
         }else{
             this.selected_frame_index = null
         }
+        this.RenderSelectedFrameProps()
     }
-    GetMaxHeight(){
+    RenderSelectedFrameProps(){
+        if(this.selected_frame_index !== null){
+            let canvas = this.frames[this.selected_frame_index]
+            this.p_frame_props.textContent = JSON.stringify(canvas.props)
+            this.div_frame_settings.classList.remove("hidden")
+        }else{
+            this.div_frame_settings.classList.add("hidden")
+        }
+    }
+    GetTallestFrameHeight(){
         return get_max_from_object_array(this.frames,"height")
     }
-    GetWidestFrame(){
+    GetWidestFrameWidth(){
         return get_max_from_object_array(this.frames,"width")
+    }
+    GetWidestFrameWidthAnchored(){
+        let max_width = 0
+        for(let frame of this.frames){
+            let width = frame.width + frame.props.anchor_x
+            if(width > max_width){
+                max_width = width
+            }
+        }
+        return max_width
+    }
+    GetTallestFrameHeightAnchored(){
+        let max_height = 0
+        for(let frame of this.frames){
+            let height = frame.height + frame.props.anchor_y
+            if(height > max_height){
+                max_height = height
+            }
+        }
+        return max_height
     }
     GetFullWidth(){
         let total = 0
@@ -63,55 +112,121 @@ class AnimationCanvasContainer extends CanvasContainer{
         }
         return total
     }
+    ResetAnimation(){
+        this.canvas.width = this.GetWidestFrameWidthAnchored()*2
+        this.canvas.height = this.GetTallestFrameHeightAnchored()*2
+        if(this.preview && this.preview.next_frame_timeout){
+            clearTimeout(this.preview.next_frame_timeout)
+        }
+        this.preview = {
+            frame_index:0,
+            needs_redraw:true,
+            centerX: parseInt(this.canvas.width/2),
+            centerY: parseInt(this.canvas.height/2),
+            next_frame_timeout:null
+        }
+    }
+    DrawIfRequired(){
+        if(this.preview && this.preview.needs_redraw){
+            this.Draw()
+        }
+    }
     Draw(){
+        let current_frame = this.frames[this.preview.frame_index]
+        let x = this.preview.centerX - current_frame.props.anchor_x
+        let y = this.preview.centerY - current_frame.props.anchor_y
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
+        this.ctx.drawImage(current_frame,x,y)
+        console.log('drew')
+        this.preview.needs_redraw = false
+        this.preview.next_frame_timeout = setTimeout(()=>{
+            this.preview.needs_redraw = true
+            this.preview.frame_index++
+            if(this.preview.frame_index >= this.frames.length){
+                this.preview.frame_index = 0
+            }
+            
+        },current_frame.props.duration)
     }
     AddControlsPane(){
-        this.div_settings = document.createElement('div')
-        this.element.appendChild(this.div_settings)
+        this.div_settings = create_and_append_element('div',this.element)
 
-        let btn_delete_sheet = document.createElement('button')
+        let btn_delete_sheet = create_and_append_element('button',this.div_settings)
         btn_delete_sheet.textContent = "Remove Animation State"
         btn_delete_sheet.onclick = ()=>{this.DeleteSelf()}
-        this.div_settings.appendChild(btn_delete_sheet)
 
-        let btn_select = document.createElement('button')
-        btn_select.textContent = "Select State"
-        btn_select.onclick = ()=>{
+        //let btn_select = create_and_append_element('button',this.div_settings)
+        //btn_select.textContent = "Select State"
+        this.element.onclick = ()=>{
             SelectAnimationState(this)
         }
-        this.div_settings.appendChild(btn_select)
 
-        let p_state_name = document.createElement('p')
+        let p_state_name = create_and_append_element('p',this.div_settings)
         p_state_name.textContent = "State Name"
-        this.div_settings.appendChild(p_state_name)
 
-        let inp_state_name = document.createElement('input')
+        let inp_state_name = create_and_append_element('input',p_state_name)
         inp_state_name.type = "text"
         inp_state_name.value = this.state_name
-        p_state_name.appendChild(inp_state_name)
-        p_state_name.onchange = (e)=>{
+        inp_state_name.onchange = (e)=>{
             this.state_name = `${inp_state_name.value}`.toUpperCase()
             console.log(this.state_name)
         }
 
-        let p_frame_duration = document.createElement('p')
+        let p_frame_duration = create_and_append_element('p',this.div_settings)
         p_frame_duration.textContent = "Frame Duration (seconds)"
-        this.div_settings.appendChild(p_frame_duration)
 
-        let inp_frame_duration = document.createElement('input')
+        let inp_frame_duration = create_and_append_element('input',p_frame_duration)
         inp_frame_duration.type = "number"
-        inp_frame_duration.value = this.default_frame_duration
-        p_frame_duration.appendChild(inp_frame_duration)
+        inp_frame_duration.value = this.default_props.duration
         inp_frame_duration.onchange = (e)=>{
-            this.default_frame_duration = parseFloat(inp_frame_duration.value)
-            console.log('default duration',this.default_frame_duration)
+            this.default_props.duration = parseFloat(inp_frame_duration.value)
         }
 
-        let div_frame_settings = document.createElement('div')
-        this.div_settings.appendChild(div_frame_settings)
+        let p_flip_x = create_and_append_element('p',this.div_settings)
+        p_flip_x.textContent = "Flip horizontally"
+
+        let chk_flip_x = create_and_append_element('input',p_flip_x)
+        chk_flip_x.type = "checkbox"
+        chk_flip_x.onchange = (e)=>{
+            this.default_props.flip_x = chk_flip_x.checked == true
+        }
+
+        let p_flip_y = create_and_append_element('p',this.div_settings)
+        p_flip_y.textContent = "Flip horizontally"
+
+        let chk_flip_y = create_and_append_element('input',p_flip_y)
+        chk_flip_y.type = "checkbox"
+        chk_flip_y.onchange = (e)=>{
+            this.default_props.flip_y = chk_flip_y.checked == true
+        }
+
+        {
+            let p_anchor_x = create_and_append_element('p',this.div_settings)
+            p_anchor_x.textContent = "Anchor X"
+
+            let inp_anchor_x = create_and_append_element('input',p_anchor_x)
+            inp_anchor_x.type = "number"
+            inp_anchor_x.onchange = (e)=>{
+                this.default_props.anchor_x = parseInt(inp_anchor_x.value)
+            }
+        }
+        {
+            let p_anchor_y = create_and_append_element('p',this.div_settings)
+            p_anchor_y.textContent = "Anchor Y"
+
+            let inp_anchor_y = create_and_append_element('input',p_anchor_y)
+            inp_anchor_y.type = "number"
+            inp_anchor_y.onchange = (e)=>{
+                this.default_props.anchor_y = parseInt(inp_anchor_y.value)
+            }
+        }
+
         
-        let btn_remove_frame = document.createElement('button')
+
+        //Per frame settings
+        this.div_frame_settings = create_and_append_element('div',this.div_settings)
+        
+        let btn_remove_frame = create_and_append_element('button',this.div_frame_settings)
         btn_remove_frame.textContent = "Remove Frame"
         btn_remove_frame.onclick = ()=>{
             if(this.selected_frame_index !== null){
@@ -121,11 +236,23 @@ class AnimationCanvasContainer extends CanvasContainer{
                 this.SelectFrame(null)
             }
         }
-        div_frame_settings.appendChild(btn_remove_frame)
-        this.div_settings.appendChild(div_frame_settings)
 
-        this.p_frame_props = document.createElement('p')
-        div_frame_settings.appendChild(this.p_frame_props)
+        let btn_apply_settings_to_frame = create_and_append_element('button',this.div_frame_settings)
+        btn_apply_settings_to_frame.textContent = "Apply Settings To Frame"
+        btn_apply_settings_to_frame.onclick = ()=>{
+            if(this.selected_frame_index !== null){
+                let frame_canvas = this.frames[this.selected_frame_index]
+                //frame_canvas.props.duration = parseFloat(inp_frame_duration.value)
+                this.ApplyPropsToFrame(this.default_props,frame_canvas)
+                this.RenderSelectedFrameProps()
+            }
+        }
+
+        this.p_frame_props = create_and_append_element('p',this.div_frame_settings)
+    }
+    ApplyPropsToFrame(props,frame_canvas){
+        frame_canvas.props = {...props}
+        this.ResetAnimation()
     }
     ButtonPress(e){
     }
