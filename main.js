@@ -66,7 +66,8 @@ function draw() {
         input_canvas_container.DrawIfRequired();
     }
     for (let animation_state of animation_states) {
-        animation_state.DrawIfRequired();
+        //disable preview for testing
+        //animation_state.DrawIfRequired();
     }
 }
 

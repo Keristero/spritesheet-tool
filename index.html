@@ -1,19 +1,20 @@
 <head>
     <script src="./helpers.js"></script>
     <script src="./Keyboard.js"></script>
-    <script src="./CanvasContainer.js"></script>
-    <script src="./AnimationCanvasContainer.js"></script>
-    <script src="./InputCanvasContainer.js"></script>
+    <script src="./ProjectMemoryManager.js" defer></script>
+    <script src="./CanvasContainer.js" defer></script>
+    <script src="./AnimationCanvasContainer.js" defer></script>
+    <script src="./InputCanvasContainer.js" defer></script>
     <script src="./main.js" defer></script>
     <link rel="stylesheet" href="style.css"></style>
 </head>
 <body>
     <div class="cell" id="settings">
-        <p>Selection Radius<input type=number value=1 id="inp_selection_radius"></input></p>
-        <p><button id="btn_add_state">Add Animation State</button></p>
     </div>
-    <div class="cell" id="input_zone"></div>
+    <div class="cell" id="input_zone">
+        <p>Selection Radius<input type=number value=1 id="inp_selection_radius"></input></p>
+    </div>
     <div class="cell" id="states_zone">
-        <canvas id="output_preview_canvas"></canvas>
+        <p><button id="btn_add_state">Add Animation State</button></p>
     </div>
 </body>

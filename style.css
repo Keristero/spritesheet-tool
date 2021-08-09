@@ -37,3 +37,7 @@ div{
 .hidden{
     display:none
 }
+
+input{
+    margin-left: 1em;
+}
