@@ -32,6 +32,11 @@ copy paste images into the web page
 1. super duper refactor
     - make state serializable in preperation for project saving and loading
 1. Add project saving
+    - save button ✅
+    - load button ✅
+    - renaming
+    - store images in project file
+    - dont copy images 
 1. Add project loading
 1. add image export
     - export cramped images, or evenly spaced
@@ -47,9 +52,6 @@ copy paste images into the web page
         - set other custom points
         - allow fine adjustment of origin bounds
 
-1. add image export
-    1. dont export duplicate frames using same bounds
-    1. have option for evenly spaced / squished output sheet layout
 1. add button to automatically import all frames from a sheet to the current animation state
 1. add button to automatically import all frames from ALL sheets
 1. make it pretty

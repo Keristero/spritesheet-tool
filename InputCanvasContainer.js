@@ -1,13 +1,20 @@
 class InputCanvasContainer extends CanvasContainer{
-    constructor(image){
-        super()
-        this.image = image
-        this.canvas.width = image.width
-        this.canvas.height = image.height
+    constructor(data){
+        let {image_url,id} = data
+        super(id)
+        this.data = data
+        this.image_loaded = false
+        this.AddControlsPane()
+        this.LoadImage(image_url)
+    }
+    async LoadImage(image_url){
+        this.image = await LoadImage(image_url)
+        this.canvas.width = this.image.width
+        this.canvas.height = this.image.height
         this.ctx.imageSmoothingEnabled = false
         this.FillImage()
-        this.AddControlsPane()
         this.GetDefaultTransparentColor()
+        this.image_loaded = true
     }
     AddControlsPane(){
         this.div_settings = create_and_append_element('div',this.element)
@@ -23,8 +30,10 @@ class InputCanvasContainer extends CanvasContainer{
         btn_delete_sheet.onclick = ()=>{this.DeleteSelf()}
     }
     FillImage(){
-        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
-        this.ctx.drawImage(this.image,0,0)
+        if(this.image_loaded){
+            this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
+            this.ctx.drawImage(this.image,0,0)
+        }
     }
     SetTransparentColor(new_color){
         this.transparent_color = new_color
@@ -54,7 +63,7 @@ class InputCanvasContainer extends CanvasContainer{
             //left click
             this.FillImage()
             if(this.bounds && point_in_bounds(this.hover_pos.x,this.hover_pos.y,this.bounds)){
-                AddFrameToSelectedState(this.canvas,this.bounds,this.anchor)
+                project_memory_manager.AddFrameToSelectedState(this.canvas,this.bounds,this.anchor)
             }else{
                 this.FindBoundingBox()
                 this.moving_anchor = true

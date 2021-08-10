@@ -11,50 +11,16 @@ const animation_states = [];
 const inp_selection_radius = document.getElementById("inp_selection_radius");
 const btn_add_state = document.getElementById("btn_add_state");
 const keyboard = new Keyboard()
-let selected_animation_state = null;
-
-function SelectAnimationState(animation_state) {
-    for (let state of animation_states) {
-        state.Deselect();
-    }
-    if(animation_state){
-        animation_state.Select();
-    }
-    selected_animation_state = animation_state;
-}
-
-function AddFrameToSelectedState(source_image, source_bounds,anchor_pos) {
-    if (!selected_animation_state) {
-        return;
-    }
-    selected_animation_state.AddFrame(source_image,source_bounds,anchor_pos)
-}
 
 btn_add_state.onclick = () => {
-    let animation_state_container = new AnimationCanvasContainer();
-    states_zone.appendChild(animation_state_container.element);
-    animation_states.push(animation_state_container);
-    animation_state_container.onDelete = () => {
-        animation_states.splice(animation_states.indexOf(animation_state_container),1);
-        SelectAnimationState(null)
-        states_zone.removeChild(animation_state_container.element);
-    };
-    SelectAnimationState(animation_state_container)
+    project_memory_manager.NewAnimationState()
 };
 
 window.addEventListener("paste", async (clipboard_event) => {
-    let images = await loadClipboardImages(clipboard_event);
-    for (let image of images) {
-        let input_canvas_container = new InputCanvasContainer(image);
-        input_zone.appendChild(input_canvas_container.element);
-        input_canvas_containers.push(input_canvas_container);
-        input_canvas_container.onDelete = () => {
-            input_canvas_containers.splice(
-                input_canvas_containers.indexOf(input_canvas_container),
-                1
-            );
-            input_zone.removeChild(input_canvas_container.element);
-        };
+    let clipboard_images = GetImagesFromClipboard(clipboard_event);
+    for (let image of clipboard_images) {
+        console.log(image)
+        project_memory_manager.NewInputSheet(image)
     }
 });
 
@@ -66,12 +32,11 @@ function draw() {
         input_canvas_container.DrawIfRequired();
     }
     for (let animation_state of animation_states) {
-        //disable preview for testing
-        //animation_state.DrawIfRequired();
+        animation_state.DrawIfRequired();
     }
 }
 
-async function loadClipboardImages(e) {
+function GetImagesFromClipboard(e) {
     let images = [];
     if (e.clipboardData == false) {
         return false;
@@ -84,20 +49,8 @@ async function loadClipboardImages(e) {
         if (img.type.indexOf("image") == -1) {
             continue;
         }
-        var imgObj = img.getAsFile();
-        var url = window.URL || window.webkitURL;
-        var src = url.createObjectURL(imgObj);
-        images.push(loadImage(src));
+        var image_object = img.getAsFile();
+        images.push(image_object);
     }
-    return await Promise.all(images);
-}
-
-function loadImage(src) {
-    return new Promise((resolve, reject) => {
-        var img = new Image();
-        img.onload = function (e) {
-            resolve(img);
-        };
-        img.src = src;
-    });
+    return images
 }

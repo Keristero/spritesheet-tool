@@ -1,5 +1,6 @@
 class CanvasContainer{
-    constructor(){
+    constructor(id){
+        this.id = id
         this.element = document.createElement('div')
         this.container = create_and_append_element('div',this.element)
         this.container.classList.add('scrollable')
@@ -44,8 +45,7 @@ class CanvasContainer{
     }
     DrawIfRequired(){
         if(this.has_hover || !this.done_lost_hover_draw){
-            this.Draw()
+            this.done_lost_hover_draw = this.Draw()
         }
-        this.done_lost_hover_draw = true
     }
 }

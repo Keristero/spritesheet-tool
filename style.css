@@ -25,8 +25,9 @@ canvas{
 }
 
 div{
+    border-width:1px;
     border-style: solid;
-    border-color:black;
+    border-color:rgba(0, 0, 0, 0.144);
     padding:0.5em;
 }
 

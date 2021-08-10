@@ -1,6 +1,8 @@
 class AnimationCanvasContainer extends CanvasContainer{
-    constructor(image){
-        super()
+    constructor(data){
+        let {id} = data
+        super(id)
+        this.data = data
         this.default_props = {
             duration:100,
             flip_x:false,
@@ -151,6 +153,7 @@ class AnimationCanvasContainer extends CanvasContainer{
             }
             
         },current_frame.props.duration)
+        return true
     }
     AddControlsPane(){
         this.div_settings = create_and_append_element('div',this.element)
@@ -158,12 +161,6 @@ class AnimationCanvasContainer extends CanvasContainer{
         let btn_delete_sheet = create_and_append_element('button',this.div_settings)
         btn_delete_sheet.textContent = "Remove Animation State"
         btn_delete_sheet.onclick = ()=>{this.DeleteSelf()}
-
-        //let btn_select = create_and_append_element('button',this.div_settings)
-        //btn_select.textContent = "Select State"
-        this.element.onclick = ()=>{
-            SelectAnimationState(this)
-        }
 
         let p_state_name = create_and_append_element('p',this.div_settings)
         p_state_name.textContent = "State Name"
