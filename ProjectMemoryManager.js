@@ -1,11 +1,10 @@
 class ProjectMemoryManager{
     constructor(){
         this.is_project_loaded = false
-        this.TryLoadProject()
-        this.CreateElements()
-
         this.input_sheet_objects = {}
         this.animation_state_objects = {}
+        this.TryLoadProject()
+        this.CreateElements()
     }
     CreateElements(){
         let div_settings = document.getElementById('settings')
@@ -55,10 +54,17 @@ class ProjectMemoryManager{
         }, false);
         
 
-        //Save project to file button
+        //Save project button
         let btn_save = create_and_append_element('button',this.element)
         btn_save.textContent = "Save Project"
         btn_save.onclick = ()=>{
+            this.SaveProject()
+        }
+
+        //Save project to file button
+        let btn_save_download = create_and_append_element('button',this.element)
+        btn_save_download.textContent = "Save and Download Project"
+        btn_save_download.onclick = ()=>{
             this.SaveProject(this.GetProjectFilename())
         }
 
@@ -100,12 +106,15 @@ class ProjectMemoryManager{
         }
         this.input_sheet_objects = {}
         for(let state_id in this.animation_state_objects){
-            let state_object = this.animation_state_objects[sheet_id]
+            let state_object = this.animation_state_objects[state_id]
             state_object.DeleteSelf()
         }
         this.animation_state_objects = {}
     }
     LoadProject(project_json){
+        //Remove all existing sheets
+        this.RemoveExistingElements()
+
         //Load project json
         try{
             let project_memory = JSON.parse(project_json)
@@ -118,9 +127,6 @@ class ProjectMemoryManager{
             alert('tried loading invalid json')
         }
 
-        //Remove all existing sheets
-        this.RemoveExistingElements()
-
         //Instantiate objects for each input sheet
         for(let sheet_id in this.memory.input_sheets){
             let sheet_data = this.memory.input_sheets[sheet_id]
@@ -132,7 +138,7 @@ class ProjectMemoryManager{
 
         //Instantiate objects for each animation state
         for(let state_id in this.memory.animation_states){
-            let state_data = this.memory.animation_states[sheet_id]
+            let state_data = this.memory.animation_states[state_id]
             if(state_data.id == undefined){
                 continue
             }
@@ -147,19 +153,18 @@ class ProjectMemoryManager{
         }
         let project_json_string = JSON.stringify(this.memory)
         localStorage.setItem('project',project_json_string)
+        console.log("Saved Project",this.memory)
         if(to_file){
             download_json_file(this.GetProjectFilename(),project_json_string)
         }
     }
-    NewInputSheet(image){
+    async NewInputSheet(image_url,image_name){
         let url = window.URL || window.webkitURL;
-        let image_data_url = url.createObjectURL(image);
-        let image_name = image.name
 
         let initial_data = {
             id:this.memory.next_input_sheet_id,
             image_name,
-            image_url:image_data_url
+            image_url
         }
 
         this.memory.input_sheets[initial_data.id] = initial_data
@@ -216,9 +221,11 @@ class ProjectMemoryManager{
     SelectAnimationState(animation_state_id) {
         console.log('Selected animation state',animation_state_id)
         for (let state_id in this.animation_state_objects) {
+            console.log('lookin at state',state_id)
             let animation_state = this.animation_state_objects[state_id]
             animation_state.Deselect();
-            if(state_id === animation_state_id){
+            if(state_id == animation_state_id){
+                console.log("it match!")
                 animation_state.Select();
                 this.memory.selected_animation_state_id = animation_state_id;
             }

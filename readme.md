@@ -30,29 +30,17 @@ copy paste images into the web page
     - allow deselection by clicking on blank spot
     - allow drag box selection
 1. super duper refactor
-    - make state serializable in preperation for project saving and loading
+    - make state serializable in preperation for project saving and loading ✅
 1. Add project saving
     - save button ✅
     - load button ✅
-    - serialize images correctly
-    ```js
-    const toDataURL = url => fetch(url)
-  .then(response => response.blob())
-  .then(blob => new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onloadend = () => resolve(reader.result)
-    reader.onerror = reject
-    reader.readAsDataURL(blob)
-  }))
-toDataURL('https://www.gravatar.com/avatar/d50c83cc0c6523b4d3f6085295c953e0')
-  .then(dataUrl => {
-    console.log('RESULT:', dataUrl)
-  })
-  ```
+    - serialize images correctly ✅
     - renaming
-    - store images in project file
+    - store images in project file ✅
     - dont copy images 
 1. Add project loading
+    - load input sheets ✅
+    - load animation states
 1. add image export
     - export cramped images, or evenly spaced
 1. allow export of ONB compatible .animation files

@@ -13,7 +13,6 @@ class InputCanvasContainer extends CanvasContainer{
         this.canvas.height = this.image.height
         this.ctx.imageSmoothingEnabled = false
         this.FillImage()
-        this.GetDefaultTransparentColor()
         this.image_loaded = true
     }
     AddControlsPane(){
@@ -22,29 +21,38 @@ class InputCanvasContainer extends CanvasContainer{
         let p_transparent_color = create_and_append_element('p',this.div_settings)
         p_transparent_color.textContent = "Transparency Color (set with scroll click)"
 
-        this.inp_zoom_scale = create_and_append_element('div',p_transparent_color)
-        this.inp_zoom_scale.style.backgroundColor = "rgba(255,0,0,0)"
+        this.div_transparent_color = create_and_append_element('div',p_transparent_color)
+        this.DisplayTransparentColor()
 
         let btn_delete_sheet = create_and_append_element('button',this.div_settings)
         btn_delete_sheet.textContent = "Remove Input Sheet"
         btn_delete_sheet.onclick = ()=>{this.DeleteSelf()}
     }
     FillImage(){
-        if(this.image_loaded){
-            this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
-            this.ctx.drawImage(this.image,0,0)
+        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
+        this.ctx.drawImage(this.image,0,0)
+    }
+    DisplayTransparentColor(){
+        this.div_transparent_color.style.backgroundColor = `rgba(${this.data.transparent_color})`
+        this.div_transparent_color.textContent = this.data.transparent_color
+    }
+    get transparent_color(){
+        if(this.data.transparent_color){
+            return this.data.transparent_color
+        }else{
+            if(this.image_loaded){
+                this.FillImage()
+                let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
+                let pixel_color = getPixel(image_data,0,0)
+            }else{
+                return [0,0,0,0]
+            }
         }
     }
-    SetTransparentColor(new_color){
-        this.transparent_color = new_color
-        this.inp_zoom_scale.style.backgroundColor = `rgba(${this.transparent_color})`
-        this.inp_zoom_scale.textContent = this.transparent_color
-        console.log(this.transparent_color)
-    }
-    GetDefaultTransparentColor(){
-        let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
-        let pixel_color = getPixel(image_data,0,0)
-        this.SetTransparentColor(pixel_color)
+    set transparent_color(new_value){
+        this.data.transparent_color = new_value
+        this.DisplayTransparentColor()
+        console.log(new_value)
     }
     ButtonRelease(e){
         if(e.button == 0){
@@ -55,7 +63,7 @@ class InputCanvasContainer extends CanvasContainer{
             this.FillImage()
             let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
             let pixel_color = getPixel(image_data,this.hover_pos.x,this.hover_pos.y)
-            this.SetTransparentColor(pixel_color)
+            this.transparent_color = (pixel_color)
         }
     }
     ButtonPress(e){
@@ -77,15 +85,20 @@ class InputCanvasContainer extends CanvasContainer{
         }
     }
     Draw(){
-        this.FillImage()
-        if(this.bounds){
-            this.ctx.fillStyle = 'rgba(0,0,255,0.1)'
-            let {minX,minY,maxX,maxY} = this.bounds
-            this.ctx.fillRect(minX,minY,(maxX-minX)+1,(maxY-minY)+1)
+        console.log('drew')
+        if(this.image_loaded){
+            this.FillImage()
+            if(this.bounds){
+                this.ctx.fillStyle = 'rgba(0,0,255,0.1)'
+                let {minX,minY,maxX,maxY} = this.bounds
+                this.ctx.fillRect(minX,minY,(maxX-minX)+1,(maxY-minY)+1)
+            }
+            if(this.anchor && this.bounds){
+                this.DrawAnchor()
+            }
+            return true
         }
-        if(this.anchor && this.bounds){
-            this.DrawAnchor()
-        }
+        return false
     }
     DrawAnchor(){
         this.ctx.fillStyle = "rgba(255,0,0,1)"

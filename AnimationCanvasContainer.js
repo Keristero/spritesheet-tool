@@ -18,6 +18,7 @@ class AnimationCanvasContainer extends CanvasContainer{
         this.RenderSelectedFrameProps()
     }
     Select(){
+        console.log('selecto')
         this.element.style.backgroundColor = "rgba(0,255,0,0.1)"
         this.selected = true
     }
