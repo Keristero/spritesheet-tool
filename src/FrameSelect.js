@@ -8,7 +8,7 @@ class FrameSelect extends CanvasContainer{
         this.RecomputeCanvasSize()
     }
     DrawIfRequired(){
-        if(this.has_hover || this.left_click_held || !this.done_lost_hover_draw){
+        if(this.has_hover || this.left_click_held || !this.done_redraw){
             this.Draw()
         }
     }
@@ -26,7 +26,39 @@ class FrameSelect extends CanvasContainer{
         }
         this.canvas.width = total_width
         this.canvas.height = max_height+this.frame_padding_y*2
-        this.done_lost_hover_draw = false
+        this.done_redraw = false
+    }
+    CheckForSelection(){
+        let selected_region = this.NormalizeSelectionBox()
+        //Draw frames
+        let x = this.frame_padding_x
+        let y = this.frame_padding_y
+        let selected_frames = []
+        for(let frame_index in this.animation_state.data.frames){
+            let frame_data = this.animation_state.data.frames[frame_index]
+            let width = (frame_data.source_bounds.maxX-frame_data.source_bounds.minX)
+            let height = (frame_data.source_bounds.maxY-frame_data.source_bounds.minY)
+            let frame_region = {
+                minX:x,
+                minY:y,
+                maxX:x+width,
+                maxY:y+height
+            }
+            if(rect_overlap(selected_region,frame_region)){
+                selected_frames.push(frame_index)
+            }
+            x += width+this.frame_padding_x
+        }
+        return selected_frames
+    }
+    FinishSelectionBox(){
+        super.FinishSelectionBox()
+        let selected_frames = this.CheckForSelection()
+        for(let frame_index of selected_frames){
+            this.animation_state.AddToSelection(frame_index)
+        }
+        console.log("selected frames",selected_frames)
+        this.ClearSelectionBox()
     }
     Draw(){
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)

@@ -29,3 +29,13 @@ function LoadImage(src) {
         img.src = src;
     });
 }
+
+function rect_overlap(region1,region2){
+    if (region1.minX < region2.maxX &&
+        region1.maxX > region2.minX &&
+        region1.minY < region2.maxY &&
+        region1.maxY > region2.minY) {
+         return true
+    }
+    return false
+}

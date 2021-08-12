@@ -18,6 +18,7 @@ body{
 
 canvas{
     image-rendering:pixelated;
+    background-color: white;
 }
 
 .scrollable{

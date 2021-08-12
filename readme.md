@@ -24,9 +24,9 @@ copy paste images into the web page
 1. add animation preview ✅
 1. add manual anchor point selection ✅
 1. allow selection of multiple frames from the same animation
-    - allow selection 
+    - allow selection ✅
     - allow hold ctrl selection 
-    - allow deselection by clicking on blank spot
+    - allow deselection by clicking on blank spot 
     - allow drag box selection
 1. super duper refactor ✅
     - make state serializable in preperation for project saving and loading ✅
@@ -45,7 +45,6 @@ copy paste images into the web page
 1. allow export of ONB compatible .animation files
 1. allow each frame property to be set individually rather than applying the whole lot at once
 1. tidy styles a bit
-
 ### V1.1
 1. redoing how sprite selection and anchor point selection works
     1. either click on a spot or drag over an area to select a single frame to be added
@@ -57,7 +56,9 @@ copy paste images into the web page
 1. add button to automatically import all frames from a sheet to the current animation state
 1. add button to automatically import all frames from ALL sheets
 1. make it pretty
-
 ### V1.3
 1. Add quick anchor point selection (relative to center, top, bottom, left, or right)
 1. Undo everything with ctrl+z!
+### ...
+### V999.9
+1. make it pretty

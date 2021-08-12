@@ -9,7 +9,7 @@ class CanvasContainer{
         this.ctx = this.canvas.getContext('2d')
         this.hover_pos={x:0,y:0}
         this.has_hover = false
-        this.done_lost_hover_draw = false
+        this.done_redraw = false
         this.AddMouseEvents()
     }
     DeleteSelf(){
@@ -20,28 +20,58 @@ class CanvasContainer{
         if(this.has_hover){
             if(e.button == 0){
                 //left click
-                this.left_click_held = true
-                this.drag_selection_start = {x:this.hover_pos.x,y:this.hover_pos.y}
+                this.ClearSelectionBox()
+                this.StartSelectionBox()
             }
         }else{
-            this.drag_selection_start = null
-            this.drag_selection_end = null
+            this.ClearSelectionBox()
         }
     }
     MouseUp(e){
         //Selection box code
         if(e.button == 0){
             //left click
-            this.left_click_held = false
+            if(this.drag_selection_start && this.drag_selection_end){
+                this.FinishSelectionBox()
+            }
         }
+    }
+    MouseClick(e){
+        if(e.button == 0){
+            this.ClearSelectionBox()
+        }
+    }
+    FinishSelectionBox(){
+        console.log('finish selection')
+        this.left_click_held = false
+    }
+    ClearSelectionBox(){
+        this.left_click_held = false
+        this.drag_selection_start = null
+        this.drag_selection_end = null
+    }
+    StartSelectionBox(){
+        console.log('start selection')
+        this.left_click_held = true
+        this.drag_selection_start = {x:this.hover_pos.x,y:this.hover_pos.y}
+    }
+    NormalizeSelectionBox(){
+        let selectionRegion = {
+            minX:Math.min(this.drag_selection_start.x,this.drag_selection_end.x),
+            minY:Math.min(this.drag_selection_start.y,this.drag_selection_end.y),
+            maxX:Math.max(this.drag_selection_start.x,this.drag_selection_end.x),
+            maxY:Math.max(this.drag_selection_start.y,this.drag_selection_end.y)
+        }
+        selectionRegion.width = selectionRegion.maxX-selectionRegion.minX
+        selectionRegion.height = selectionRegion.maxY-selectionRegion.minY
+        selectionRegion.x = selectionRegion.minX
+        selectionRegion.y = selectionRegion.minY
+        return selectionRegion
     }
     DrawSelectionBox(){
         if(this.drag_selection_start && this.drag_selection_end){
             this.ctx.fillStyle = 'rgba(0,0,255,0.1)'
-            let x =  Math.min(this.drag_selection_start.x,this.drag_selection_end.x)
-            let y = Math.min(this.drag_selection_start.y,this.drag_selection_end.y)
-            let width = Math.max(this.drag_selection_start.x,this.drag_selection_end.x) - x
-            let height = Math.max(this.drag_selection_start.y,this.drag_selection_end.y) - y
+            let {x,y,width,height} = this.NormalizeSelectionBox()
             this.ctx.fillRect(x,y,width,height)
         }
     }
@@ -53,11 +83,11 @@ class CanvasContainer{
 
         //Selection box code
         if(this.left_click_held){
-            this.drag_selection_end = this.ConstrainCoordinates(this.hover_pos)
+            this.drag_selection_end = {x:this.hover_pos.x,y:this.hover_pos.y}
         }
     }
     AddMouseEvents(){
-        document.addEventListener('mousemove',(e)=>{
+        this.canvas.addEventListener('mousemove',(e)=>{
             this.MouseMove(e)
         })
         this.canvas.onmouseover = (e)=>{
@@ -65,21 +95,21 @@ class CanvasContainer{
         }
         this.canvas.onmouseout = (e)=>{
             this.has_hover = false
-            this.done_lost_hover_draw = false
+            this.done_redraw = false
         }
-        document.addEventListener('mouseclick',(e)=>{
+        this.canvas.addEventListener('click',(e)=>{
             this.MouseClick(e)
         })
-        document.addEventListener('mousedown',(e)=>{
+        this.canvas.addEventListener('mousedown',(e)=>{
             this.MouseDown(e)
         })
-        document.addEventListener('mouseup',(e)=>{
+        this.canvas.addEventListener('mouseup',(e)=>{
             this.MouseUp(e)
         })
     }
     DrawIfRequired(){
-        if(this.has_hover || !this.done_lost_hover_draw){
-            this.done_lost_hover_draw = this.Draw()
+        if(this.has_hover || !this.done_redraw){
+            this.done_redraw = this.Draw()
         }
     }
     ConstrainCoordinates(pos){

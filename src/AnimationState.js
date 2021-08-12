@@ -47,20 +47,21 @@ class AnimationState extends CanvasContainer{
         this.frame_select.RecomputeCanvasSize()
     }
     ClearFrameSelection(){
-        this.selected_frame_indexes = []
+        this.selected_frame_indexes = {}
+        this.RenderSelectedFrameProps()
     }
-    SelectFrame(frame_index){
+    AddToSelection(frame_index){
         if(this.data.frames[frame_index]){
-            this.selected_frame_indexes.push(frame_index)
+            this.selected_frame_indexes[frame_index] = true
         }
         this.RenderSelectedFrameProps()
     }
     RenderSelectedFrameProps(){
         this.div_frame_settings.classList.add("hidden")
         this.p_frame_props.textContent = ""
-        for(let frame_index of this.selected_frame_indexes){
+        for(let frame_index in this.selected_frame_indexes){
             let frame = this.data.frames[frame_index]
-            this.p_frame_props.textContent += JSON.stringify(frame)
+            this.p_frame_props.textContent += `${JSON.stringify(frame)}<br>`
             this.div_frame_settings.classList.remove("hidden")
         }
     }
@@ -209,9 +210,8 @@ class AnimationState extends CanvasContainer{
         let btn_remove_frame = create_and_append_element('button',this.div_frame_settings)
         btn_remove_frame.textContent = "Remove Frame"
         btn_remove_frame.onclick = ()=>{
-            for(let frame_canvas of this.selected_frame_indexes){
-                this.frame_canvases.splice(this.frame_canvases.indexOf(frame_canvas),1)
-                this.element.removeChild(frame_canvas)
+            for(let frame_index in this.selected_frame_indexes){
+                this.data.frames.splice(frame_index,1)
                 this.ClearFrameSelection()
             }
         }
@@ -219,19 +219,14 @@ class AnimationState extends CanvasContainer{
         let btn_apply_settings_to_frame = create_and_append_element('button',this.div_frame_settings)
         btn_apply_settings_to_frame.textContent = "Apply Settings To Frame"
         btn_apply_settings_to_frame.onclick = ()=>{
-            for(let frame_canvas of this.selected_frame_indexes){
-                this.ApplyPropsToFrame(this.data.default_props,frame_canvas)
+            for(let frame_data of this.data.frames){
+                Object.assign(frame_data,props)
+                this.ResetAnimation()
             }
             this.RenderSelectedFrameProps()
         }
 
         this.p_frame_props = create_and_append_element('p',this.div_frame_settings)
-    }
-    ApplyPropsToFrame(props,frame_canvas){
-        frame_canvas.props = {...props}
-        this.ResetAnimation()
-    }
-    MouseDown(e){
     }
 }
 
