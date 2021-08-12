@@ -13,34 +13,33 @@ copy paste images into the web page
 1. add button to delete input sheets ✅
 1. allow adding, removing, and selection of animation states ✅
 1. add current bounding box to selected animation state ✅
-1. add per frame OR entire animation settings
+1. add per frame OR entire default animation settings ✅
     1. duration ✅
     1. anchor ✅
     1. flipx ✅
     1. flipy ✅
 1. auto select first added animation ✅
 1. add zoom scaling ✅
-    - you can zoom the web page and the pixel scaling does not break too badly
-    - once the detailed frame editor is added in V1.1 this wont be needed
+    - you can zoom the web page and the pixel scaling does not break too badly ✅
 1. add animation preview ✅
 1. add manual anchor point selection ✅
 1. allow selection of multiple frames from the same animation
-    - allow selection ✅
-    - allow hold ctrl selection ✅
+    - allow selection 
+    - allow hold ctrl selection 
     - allow deselection by clicking on blank spot
     - allow drag box selection
-1. super duper refactor
+1. super duper refactor ✅
     - make state serializable in preperation for project saving and loading ✅
 1. Add project saving
     - save button ✅
     - load button ✅
     - serialize images correctly ✅
-    - renaming
+    - renaming ✅
     - store images in project file ✅
-    - dont copy images 
+    - dont copy images ✅
 1. Add project loading
     - load input sheets ✅
-    - load animation states
+    - load animation states ✅
 1. add image export
     - export cramped images, or evenly spaced
 1. allow export of ONB compatible .animation files

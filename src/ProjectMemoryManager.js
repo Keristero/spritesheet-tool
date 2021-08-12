@@ -182,7 +182,7 @@ class ProjectMemoryManager{
     }
     PrepareInputSheet(sheet_data){
         //instantiate an input sheet as a source of animation frames
-        let input_sheet = new InputCanvasContainer(sheet_data)
+        let input_sheet = new InputSheet(sheet_data)
         this.input_sheet_objects[sheet_data.id] = input_sheet
 
         //Append the element to the page
@@ -198,7 +198,7 @@ class ProjectMemoryManager{
     }
     PrepareAnimationState(state_data){
         //instantiate an animation state
-        let animation_state = new AnimationCanvasContainer(state_data)
+        let animation_state = new AnimationState(state_data)
         this.animation_state_objects[state_data.id] = animation_state
 
         //Append the element to the page
@@ -219,13 +219,10 @@ class ProjectMemoryManager{
         return animation_state
     }
     SelectAnimationState(animation_state_id) {
-        console.log('Selected animation state',animation_state_id)
         for (let state_id in this.animation_state_objects) {
-            console.log('lookin at state',state_id)
             let animation_state = this.animation_state_objects[state_id]
             animation_state.Deselect();
             if(state_id == animation_state_id){
-                console.log("it match!")
                 animation_state.Select();
                 this.memory.selected_animation_state_id = animation_state_id;
             }
@@ -237,6 +234,12 @@ class ProjectMemoryManager{
         }
         let selected_animation_state = this.animation_state_objects[this.memory.selected_animation_state_id]
         selected_animation_state.AddFrame(source_image,source_bounds,anchor_pos)
+    }
+    GetInputSheetById(id){
+        if(this.input_sheet_objects[id]){
+            return this.input_sheet_objects[id]
+        }
+        return null
     }
 }
 

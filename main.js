@@ -45,6 +45,7 @@ function draw() {
     for (let animation_state_id in project_memory_manager.animation_state_objects) {
         let animation_state = project_memory_manager.animation_state_objects[animation_state_id]
         animation_state.DrawIfRequired();
+        animation_state.frame_select.DrawIfRequired();
     }
 }
 

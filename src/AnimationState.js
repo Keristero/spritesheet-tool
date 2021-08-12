@@ -1,24 +1,32 @@
-class AnimationCanvasContainer extends CanvasContainer{
+class AnimationState extends CanvasContainer{
     constructor(data){
         let {id} = data
         super(id)
         this.data = data
-        this.default_props = {
-            duration:100,
-            flip_x:false,
-            flip_y:false,
-            anchor_x:0,
-            anchor_y:0
+        if(!this.data.default_props){
+            this.data.default_props = {
+                duration:100,
+                flip_x:false,
+                flip_y:false,
+                anchor_x:0,
+                anchor_y:0
+            }
+        }
+        if(!this.data.state_name){
+            this.data.state_name = ""
+        }
+        if(!this.data.frames){
+            this.data.frames = []
         }
         this.AddControlsPane()
-        this.state_name = ""
         this.selected = false
-        this.frames = []
-        this.selected_frames = []
+        this.selected_frame_indexes = []
+        this.frame_select = new FrameSelect({id:0,animation_state:this})
+        this.element.append(this.frame_select.element)
         this.RenderSelectedFrameProps()
+        this.ResetAnimation()
     }
     Select(){
-        console.log('selecto')
         this.element.style.backgroundColor = "rgba(0,255,0,0.1)"
         this.selected = true
     }
@@ -26,76 +34,40 @@ class AnimationCanvasContainer extends CanvasContainer{
         this.element.style.backgroundColor = "rgba(0,0,0,0)"
         this.selected = false
     }
-    AddFrame(source_image,source_bounds,anchor_pos){
-        let {minX, minY, maxX, maxY} = source_bounds
-        let canvas = document.createElement('canvas')
-        let width = maxX-minX
-        let height = maxY-minY
-        canvas.width = width
-        canvas.height = height
-        let ctx = canvas.getContext('2d')
-        ctx.drawImage(source_image,minX,minY,width,height,0,0,width,height)
-        let local_anchor_pos = {
-            x:this.default_props.anchor_x,
-            y:this.default_props.anchor_y
+    AddFrame(source_input_sheet_object,source_bounds,anchor_pos){
+        let new_frame_data = {
+            sheet_id:source_input_sheet_object.id,
+            source_bounds:source_bounds,
+            anchor_pos:anchor_pos,
+            duration:this.data.default_props.duration
         }
-        if(anchor_pos){
-            local_anchor_pos.x = anchor_pos.x-minX
-            local_anchor_pos.y = anchor_pos.y-minY
-        }
-        //set frame properties
-        canvas.props = {
-            duration:this.default_props.duration,
-            flip_x:this.default_props.flip_x,
-            flip_y:this.default_props.flip_y,
-            anchor_x:local_anchor_pos.x,
-            anchor_y:local_anchor_pos.y
-        }
-        this.frames.push(canvas)
-        this.element.appendChild(canvas)
-        console.log('adding frame',canvas.width)
-        this.canvas.width = this.GetWidestFrameWidth()
-        this.canvas.height = this.GetTallestFrameHeight()
-        canvas.onclick = ()=>{
-            if(!keyboard.CtrlIsHeld()){
-                this.ClearFrameSelection()
-            }
-            this.SelectFrame(canvas)
-        }
+        console.log('Added Frame',new_frame_data)
+        this.data.frames.push(new_frame_data)
         this.ResetAnimation()
+        this.frame_select.RecomputeCanvasSize()
     }
     ClearFrameSelection(){
-        this.selected_frames = []
-        for(let frame of this.frames){
-            frame.classList.remove("selected")
-        }
+        this.selected_frame_indexes = []
     }
-    SelectFrame(canvas){
-        if(!canvas || this.selected_frames.indexOf(canvas) >= 0){
-            return
+    SelectFrame(frame_index){
+        if(this.data.frames[frame_index]){
+            this.selected_frame_indexes.push(frame_index)
         }
-        this.selected_frames.push(canvas)
-        canvas.classList.add("selected")
         this.RenderSelectedFrameProps()
     }
     RenderSelectedFrameProps(){
         this.div_frame_settings.classList.add("hidden")
         this.p_frame_props.textContent = ""
-        for(let canvas of this.selected_frames){
-            this.p_frame_props.textContent += JSON.stringify(canvas.props)
+        for(let frame_index of this.selected_frame_indexes){
+            let frame = this.data.frames[frame_index]
+            this.p_frame_props.textContent += JSON.stringify(frame)
             this.div_frame_settings.classList.remove("hidden")
         }
     }
-    GetTallestFrameHeight(){
-        return get_max_from_object_array(this.frames,"height")
-    }
-    GetWidestFrameWidth(){
-        return get_max_from_object_array(this.frames,"width")
-    }
     GetWidestFrameWidthAnchored(){
         let max_width = 0
-        for(let frame of this.frames){
-            let width = frame.width + frame.props.anchor_x
+        for(let frame_data of this.data.frames){
+            let width = (frame_data.source_bounds.maxX-frame_data.source_bounds.minX) + (frame_data.anchor_pos.x-frame_data.source_bounds.minX)
             if(width > max_width){
                 max_width = width
             }
@@ -104,20 +76,13 @@ class AnimationCanvasContainer extends CanvasContainer{
     }
     GetTallestFrameHeightAnchored(){
         let max_height = 0
-        for(let frame of this.frames){
-            let height = frame.height + frame.props.anchor_y
+        for(let frame_data of this.data.frames){
+            let height = (frame_data.source_bounds.maxY-frame_data.source_bounds.minY) + (frame_data.anchor_pos.y-frame_data.source_bounds.minY)
             if(height > max_height){
                 max_height = height
             }
         }
         return max_height
-    }
-    GetFullWidth(){
-        let total = 0
-        for(let frame of this.frames){
-            total += frame.width
-        }
-        return total
     }
     ResetAnimation(){
         this.canvas.width = this.GetWidestFrameWidthAnchored()*2
@@ -134,26 +99,35 @@ class AnimationCanvasContainer extends CanvasContainer{
         }
     }
     DrawIfRequired(){
-        if(this.frames.length > 0 && this.preview && this.preview.needs_redraw){
+        if(this.data.frames.length > 0 && this.preview && this.preview.needs_redraw){
             this.Draw()
         }
     }
+    DrawFrameData(frame_data,target_ctx,x,y){
+        let {minX, minY, maxX, maxY} = frame_data.source_bounds
+        let {sheet_id} = frame_data
+        let width = maxX-minX
+        let height = maxY-minY
+        let source_sheet_object = project_memory_manager.GetInputSheetById(sheet_id)
+        let source_canvas = source_sheet_object.canvas
+        target_ctx.drawImage(source_canvas,minX,minY,width,height,x,y,width,height)
+    }
     Draw(){
-        let current_frame = this.frames[this.preview.frame_index]
-        let x = this.preview.centerX - current_frame.props.anchor_x
-        let y = this.preview.centerY - current_frame.props.anchor_y
+        let current_frame_data = this.data.frames[this.preview.frame_index]
+        let x = this.preview.centerX - (current_frame_data.anchor_pos.x-current_frame_data.source_bounds.minX)
+        let y = this.preview.centerY - (current_frame_data.anchor_pos.y-current_frame_data.source_bounds.minY)
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
-        this.ctx.drawImage(current_frame,x,y)
-        console.log('drew')
+        this.DrawFrameData(current_frame_data,this.ctx,x,y)
+
         this.preview.needs_redraw = false
         this.preview.next_frame_timeout = setTimeout(()=>{
             this.preview.needs_redraw = true
             this.preview.frame_index++
-            if(this.preview.frame_index >= this.frames.length){
+            if(this.preview.frame_index >= this.data.frames.length){
                 this.preview.frame_index = 0
             }
             
-        },current_frame.props.duration)
+        },current_frame_data.duration)
         return true
     }
     AddControlsPane(){
@@ -168,10 +142,10 @@ class AnimationCanvasContainer extends CanvasContainer{
 
         let inp_state_name = create_and_append_element('input',p_state_name)
         inp_state_name.type = "text"
-        inp_state_name.value = this.state_name
+        inp_state_name.value = this.data.state_name
         inp_state_name.onchange = (e)=>{
-            this.state_name = `${inp_state_name.value}`.toUpperCase()
-            console.log(this.state_name)
+            this.data.state_name = `${inp_state_name.value}`.toUpperCase()
+            console.log(this.data.state_name)
         }
 
         let p_frame_duration = create_and_append_element('p',this.div_settings)
@@ -179,9 +153,9 @@ class AnimationCanvasContainer extends CanvasContainer{
 
         let inp_frame_duration = create_and_append_element('input',p_frame_duration)
         inp_frame_duration.type = "number"
-        inp_frame_duration.value = this.default_props.duration
+        inp_frame_duration.value = this.data.default_props.duration
         inp_frame_duration.onchange = (e)=>{
-            this.default_props.duration = parseFloat(inp_frame_duration.value)
+            this.data.default_props.duration = parseFloat(inp_frame_duration.value)
         }
 
         let p_flip_x = create_and_append_element('p',this.div_settings)
@@ -189,17 +163,19 @@ class AnimationCanvasContainer extends CanvasContainer{
 
         let chk_flip_x = create_and_append_element('input',p_flip_x)
         chk_flip_x.type = "checkbox"
+        chk_flip_x.checked = this.data.default_props.flip_x
         chk_flip_x.onchange = (e)=>{
-            this.default_props.flip_x = chk_flip_x.checked == true
+            this.data.default_props.flip_x = chk_flip_x.checked == true
         }
 
         let p_flip_y = create_and_append_element('p',this.div_settings)
-        p_flip_y.textContent = "Flip horizontally"
+        p_flip_y.textContent = "Flip vertically"
 
         let chk_flip_y = create_and_append_element('input',p_flip_y)
         chk_flip_y.type = "checkbox"
+        chk_flip_y.checked = this.data.default_props.flip_y
         chk_flip_y.onchange = (e)=>{
-            this.default_props.flip_y = chk_flip_y.checked == true
+            this.data.default_props.flip_y = chk_flip_y.checked == true
         }
 
         {
@@ -208,8 +184,9 @@ class AnimationCanvasContainer extends CanvasContainer{
 
             let inp_anchor_x = create_and_append_element('input',p_anchor_x)
             inp_anchor_x.type = "number"
+            inp_anchor_x.value = this.data.default_props.anchor_x
             inp_anchor_x.onchange = (e)=>{
-                this.default_props.anchor_x = parseInt(inp_anchor_x.value)
+                this.data.default_props.anchor_x = parseInt(inp_anchor_x.value)
             }
         }
         {
@@ -218,8 +195,9 @@ class AnimationCanvasContainer extends CanvasContainer{
 
             let inp_anchor_y = create_and_append_element('input',p_anchor_y)
             inp_anchor_y.type = "number"
+            inp_anchor_y.value = this.data.default_props.anchor_y
             inp_anchor_y.onchange = (e)=>{
-                this.default_props.anchor_y = parseInt(inp_anchor_y.value)
+                this.data.default_props.anchor_y = parseInt(inp_anchor_y.value)
             }
         }
 
@@ -231,8 +209,8 @@ class AnimationCanvasContainer extends CanvasContainer{
         let btn_remove_frame = create_and_append_element('button',this.div_frame_settings)
         btn_remove_frame.textContent = "Remove Frame"
         btn_remove_frame.onclick = ()=>{
-            for(let frame_canvas of this.selected_frames){
-                this.frames.splice(this.frames.indexOf(frame_canvas),1)
+            for(let frame_canvas of this.selected_frame_indexes){
+                this.frame_canvases.splice(this.frame_canvases.indexOf(frame_canvas),1)
                 this.element.removeChild(frame_canvas)
                 this.ClearFrameSelection()
             }
@@ -241,8 +219,8 @@ class AnimationCanvasContainer extends CanvasContainer{
         let btn_apply_settings_to_frame = create_and_append_element('button',this.div_frame_settings)
         btn_apply_settings_to_frame.textContent = "Apply Settings To Frame"
         btn_apply_settings_to_frame.onclick = ()=>{
-            for(let frame_canvas of this.selected_frames){
-                this.ApplyPropsToFrame(this.default_props,frame_canvas)
+            for(let frame_canvas of this.selected_frame_indexes){
+                this.ApplyPropsToFrame(this.data.default_props,frame_canvas)
             }
             this.RenderSelectedFrameProps()
         }
@@ -253,7 +231,7 @@ class AnimationCanvasContainer extends CanvasContainer{
         frame_canvas.props = {...props}
         this.ResetAnimation()
     }
-    ButtonPress(e){
+    MouseDown(e){
     }
 }
 

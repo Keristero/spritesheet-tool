@@ -1,4 +1,4 @@
-class InputCanvasContainer extends CanvasContainer{
+class InputSheet extends CanvasContainer{
     constructor(data){
         let {image_url,id} = data
         super(id)
@@ -54,27 +54,31 @@ class InputCanvasContainer extends CanvasContainer{
         this.DisplayTransparentColor()
         console.log(new_value)
     }
-    ButtonRelease(e){
-        if(e.button == 0){
-            //left click
-            this.moving_anchor = false
-        }else if(e.button == 1){
-            //middle click
-            this.FillImage()
-            let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
-            let pixel_color = getPixel(image_data,this.hover_pos.x,this.hover_pos.y)
-            this.transparent_color = (pixel_color)
+    MouseUp(e){
+        if(this.has_hover){
+            if(e.button == 0){
+                //left click
+                this.moving_anchor = false
+            }else if(e.button == 1){
+                //middle click
+                this.FillImage()
+                let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
+                let pixel_color = getPixel(image_data,this.hover_pos.x,this.hover_pos.y)
+                this.transparent_color = (pixel_color)
+            }
         }
     }
-    ButtonPress(e){
-        if(e.button == 0){
-            //left click
-            this.FillImage()
-            if(this.bounds && point_in_bounds(this.hover_pos.x,this.hover_pos.y,this.bounds)){
-                project_memory_manager.AddFrameToSelectedState(this.canvas,this.bounds,this.anchor)
-            }else{
-                this.FindBoundingBox()
-                this.moving_anchor = true
+    MouseDown(e){
+        if(this.has_hover){
+            if(e.button == 0){
+                //left click
+                this.FillImage()
+                if(this.bounds && point_in_bounds(this.hover_pos.x,this.hover_pos.y,this.bounds)){
+                    project_memory_manager.AddFrameToSelectedState(this,this.bounds,this.anchor)
+                }else{
+                    this.FindBoundingBox()
+                    this.moving_anchor = true
+                }
             }
         }
     }
