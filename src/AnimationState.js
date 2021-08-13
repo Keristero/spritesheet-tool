@@ -22,7 +22,7 @@ class AnimationState extends CanvasContainer{
         this.selected = false
         this.selected_frame_indexes = []
         this.frame_select = new FrameSelect({id:0,animation_state:this})
-        this.element.append(this.frame_select.element)
+        this.div_settings.insertBefore(this.frame_select.element,this.div_frame_settings)
         this.RenderSelectedFrameProps()
         this.ResetAnimation()
     }
@@ -50,6 +50,14 @@ class AnimationState extends CanvasContainer{
         this.selected_frame_indexes = {}
         this.RenderSelectedFrameProps()
     }
+    DeleteSelectedFrames(){
+        let frames = this.GetSelectedFrames()
+        for(let frame_data of frames){
+            this.data.frames.splice(this.data.frames.indexOf(frame_data))
+        }
+        this.ClearFrameSelection()
+        this.ResetAnimation()
+    }
     AddToSelection(frame_index){
         if(this.data.frames[frame_index]){
             this.selected_frame_indexes[frame_index] = true
@@ -57,13 +65,16 @@ class AnimationState extends CanvasContainer{
         this.RenderSelectedFrameProps()
     }
     RenderSelectedFrameProps(){
+        //annoying
+        /*
         this.div_frame_settings.classList.add("hidden")
         this.p_frame_props.textContent = ""
         for(let frame_index in this.selected_frame_indexes){
             let frame = this.data.frames[frame_index]
-            this.p_frame_props.textContent += `${JSON.stringify(frame)}<br>`
+            this.p_frame_props.textContent += `${JSON.stringify(frame)}`
             this.div_frame_settings.classList.remove("hidden")
         }
+        */
     }
     GetWidestFrameWidthAnchored(){
         let max_width = 0
@@ -210,23 +221,27 @@ class AnimationState extends CanvasContainer{
         let btn_remove_frame = create_and_append_element('button',this.div_frame_settings)
         btn_remove_frame.textContent = "Remove Frame"
         btn_remove_frame.onclick = ()=>{
-            for(let frame_index in this.selected_frame_indexes){
-                this.data.frames.splice(frame_index,1)
-                this.ClearFrameSelection()
-            }
+            this.DeleteSelectedFrames()
         }
 
         let btn_apply_settings_to_frame = create_and_append_element('button',this.div_frame_settings)
         btn_apply_settings_to_frame.textContent = "Apply Settings To Frame"
         btn_apply_settings_to_frame.onclick = ()=>{
             for(let frame_data of this.data.frames){
-                Object.assign(frame_data,props)
+                Object.assign(frame_data,this.data.default_props)
                 this.ResetAnimation()
             }
             this.RenderSelectedFrameProps()
         }
 
         this.p_frame_props = create_and_append_element('p',this.div_frame_settings)
+    }
+    GetSelectedFrames(){
+        let selected_frames = []
+        for(let frame_index in this.selected_frame_indexes){
+            selected_frames.push(this.selected_frame_indexes[frame_index])
+        }
+        return selected_frames
     }
 }
 

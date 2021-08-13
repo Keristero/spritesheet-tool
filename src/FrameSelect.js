@@ -28,9 +28,7 @@ class FrameSelect extends CanvasContainer{
         this.canvas.height = max_height+this.frame_padding_y*2
         this.done_redraw = false
     }
-    CheckForSelection(){
-        let selected_region = this.NormalizeSelectionBox()
-        //Draw frames
+    CheckForSelection(selected_region){
         let x = this.frame_padding_x
         let y = this.frame_padding_y
         let selected_frames = []
@@ -51,9 +49,22 @@ class FrameSelect extends CanvasContainer{
         }
         return selected_frames
     }
+    MouseClick(e){
+        super.MouseClick(e)
+        let selected_frames = this.CheckForSelection({minX:this.hover_pos.x,minY:this.hover_pos.y,maxX:this.hover_pos.x,maxY:this.hover_pos.y})
+        for(let frame_index of selected_frames){
+            this.animation_state.AddToSelection(frame_index)
+        }
+        console.log("selected frames",selected_frames)
+        this.ClearSelectionBox()
+    }
+    StartSelectionBox(){
+        super.StartSelectionBox()
+        this.animation_state.ClearFrameSelection()
+    }
     FinishSelectionBox(){
         super.FinishSelectionBox()
-        let selected_frames = this.CheckForSelection()
+        let selected_frames = this.CheckForSelection(this.NormalizeSelectionBox())
         for(let frame_index of selected_frames){
             this.animation_state.AddToSelection(frame_index)
         }
@@ -65,9 +76,17 @@ class FrameSelect extends CanvasContainer{
         //Draw frames
         let x = this.frame_padding_x
         let y = this.frame_padding_y
+        this.ctx.fillStyle = 'rgba(0,0,255,0.1)'
+        this.ctx.strokeStyle = 'rgba(0,0,255,1)'
         for(let frame_index in this.animation_state.data.frames){
             let frame_data = this.animation_state.data.frames[frame_index]
+            let width = (frame_data.source_bounds.maxX-frame_data.source_bounds.minX)
+            let height = (frame_data.source_bounds.maxY-frame_data.source_bounds.minY)
             this.animation_state.DrawFrameData(frame_data,this.ctx,x,y)
+            if(this.animation_state.selected_frame_indexes[frame_index]){
+                this.ctx.fillRect(x,y,width,height)
+                this.ctx.strokeRect(x,y,width,height)
+            }
             x += (frame_data.source_bounds.maxX-frame_data.source_bounds.minX)+this.frame_padding_x
         }
         

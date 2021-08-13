@@ -26,8 +26,8 @@ copy paste images into the web page
 1. allow selection of multiple frames from the same animation
     - allow selection ✅
     - allow hold ctrl selection 
-    - allow deselection by clicking on blank spot 
-    - allow drag box selection
+    - allow deselection by clicking on blank spot ✅
+    - allow drag box selection ✅
 1. super duper refactor ✅
     - make state serializable in preperation for project saving and loading ✅
 1. Add project saving
