@@ -33,6 +33,20 @@ div{
     box-shadow:0px 0px 0px 2px blue inset;
 }
 
+.tab :hover{
+    background-color: rgba(100,100,100,0.5);
+}
+
+.tab{
+    background-color: rgba(100,100,100,0.1);
+    width:100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 1em;
+    margin: 0;
+}
+
 .hidden{
     display:none
 }
@@ -47,4 +61,8 @@ input{
 
 p{
     padding-left:0.5em
+}
+
+select{
+    margin-left:0.5em;
 }

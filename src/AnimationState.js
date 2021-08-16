@@ -25,6 +25,7 @@ class AnimationState extends CanvasContainer{
         this.div_settings.insertBefore(this.frame_select.element,this.div_frame_settings)
         this.RenderSelectedFrameProps()
         this.ResetAnimation()
+        this.UpdateTabTitle(this.data.state_name)
     }
     Select(){
         this.element.style.backgroundColor = "rgba(0,255,0,0.1)"
@@ -53,7 +54,7 @@ class AnimationState extends CanvasContainer{
     DeleteSelectedFrames(){
         let frames = this.GetSelectedFrames()
         for(let frame_data of frames){
-            this.data.frames.splice(this.data.frames.indexOf(frame_data))
+            this.data.frames.splice(this.data.frames.indexOf(frame_data),1)
         }
         this.ClearFrameSelection()
         this.ResetAnimation()
@@ -143,7 +144,7 @@ class AnimationState extends CanvasContainer{
         return true
     }
     AddControlsPane(){
-        this.div_settings = create_and_append_element('div',this.element)
+        this.div_settings = create_and_append_element('div',this.contents)
 
         let btn_delete_sheet = create_and_append_element('button',this.div_settings)
         btn_delete_sheet.textContent = "Remove Animation State"
@@ -158,6 +159,7 @@ class AnimationState extends CanvasContainer{
         inp_state_name.onchange = (e)=>{
             this.data.state_name = `${inp_state_name.value}`.toUpperCase()
             console.log(this.data.state_name)
+            this.UpdateTabTitle(this.data.state_name)
         }
 
         let p_frame_duration = create_and_append_element('p',this.div_settings)
@@ -239,7 +241,7 @@ class AnimationState extends CanvasContainer{
     GetSelectedFrames(){
         let selected_frames = []
         for(let frame_index in this.selected_frame_indexes){
-            selected_frames.push(this.selected_frame_indexes[frame_index])
+            selected_frames.push(this.data.frames[parseInt(frame_index)])
         }
         return selected_frames
     }

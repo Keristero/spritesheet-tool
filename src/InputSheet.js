@@ -1,11 +1,13 @@
 class InputSheet extends CanvasContainer{
     constructor(data){
-        let {image_url,id} = data
+        let {image_url,id,image_name} = data
         super(id)
         this.data = data
         this.image_loaded = false
+        this.image_name = image_name
         this.AddControlsPane()
         this.LoadImage(image_url)
+        this.UpdateTabTitle(this.image_name)
     }
     async LoadImage(image_url){
         this.image = await LoadImage(image_url)
@@ -16,7 +18,7 @@ class InputSheet extends CanvasContainer{
         this.image_loaded = true
     }
     AddControlsPane(){
-        this.div_settings = create_and_append_element('div',this.element)
+        this.div_settings = create_and_append_element('div',this.contents)
 
         let p_transparent_color = create_and_append_element('p',this.div_settings)
         p_transparent_color.textContent = "Transparency Color (set with scroll click)"

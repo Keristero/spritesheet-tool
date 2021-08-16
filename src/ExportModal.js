@@ -142,7 +142,7 @@ function output_data_to_animation_format(output_data){
         
         for(let frame of animation_state.frames){
             let {duration,x,y,width,height,anchor_x,anchor_y,flip_x,flip_y} = frame
-            output_txt += `frame duration="${duration}" x="${x}" y="${y}" w="${width}" h="${height}" originx="${anchor_x}" originy="${anchor_y}"`
+            output_txt += `frame duration="${duration/1000}" x="${x}" y="${y}" w="${width}" h="${height}" originx="${anchor_x}" originy="${anchor_y}"`
             if(flip_x){
                 output_txt += ` flipx="1"`
             }

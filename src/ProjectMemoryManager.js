@@ -219,7 +219,7 @@ class ProjectMemoryManager{
         };
 
         //Add selection callback
-        animation_state.element.onclick = ()=>{
+        animation_state.contents.onclick = ()=>{
             this.SelectAnimationState(animation_state.id)
         }
         

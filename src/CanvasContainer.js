@@ -2,7 +2,19 @@ class CanvasContainer{
     constructor(id){
         this.id = id
         this.element = document.createElement('div')
-        this.container = create_and_append_element('div',this.element)
+        this.button_tab_title = create_and_append_element('button',this.element)
+        this.button_tab_title.textContent = "..."
+        this.button_tab_title.classList.add('tab')
+        this.button_tab_title.onclick = ()=>{
+            let collapsible = this.button_tab_title.nextElementSibling
+            if(collapsible.style.display == "none"){
+                collapsible.style.display = "block"
+            }else{
+                collapsible.style.display = "none"
+            }
+        }
+        this.contents = create_and_append_element('div',this.element)
+        this.container = create_and_append_element('div',this.contents)
         this.container.classList.add('scrollable')
         this.canvas = create_and_append_element('canvas',this.container)
         this.canvas.onselectstart = ()=>{return false}//supress selection
@@ -11,6 +23,9 @@ class CanvasContainer{
         this.has_hover = false
         this.done_redraw = false
         this.AddMouseEvents()
+    }
+    UpdateTabTitle(title_text){
+        this.button_tab_title.textContent = title_text
     }
     DeleteSelf(){
         this.onDelete()
