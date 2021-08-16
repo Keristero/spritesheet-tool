@@ -17,6 +17,7 @@ class ProjectMemoryManager{
             if(window.confirm("This will overwrite your existing project, are you sure?")){
                 this.NewProject()
                 this.SaveProject()
+                location.reload()
             }
         }
 

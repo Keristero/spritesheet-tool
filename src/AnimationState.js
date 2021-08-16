@@ -40,7 +40,9 @@ class AnimationState extends CanvasContainer{
             sheet_id:source_input_sheet_object.id,
             source_bounds:source_bounds,
             anchor_pos:anchor_pos,
-            duration:this.data.default_props.duration
+            duration:this.data.default_props.duration,
+            flip_x:this.data.default_props.flip_x,
+            flip_y:this.data.default_props.flip_y
         }
         console.log('Added Frame',new_frame_data)
         this.data.frames.push(new_frame_data)
@@ -119,11 +121,11 @@ class AnimationState extends CanvasContainer{
     DrawFrameData(frame_data,target_ctx,x,y){
         let {minX, minY, maxX, maxY} = frame_data.source_bounds
         let {sheet_id} = frame_data
-        let width = maxX-minX
-        let height = maxY-minY
+        let width = Math.floor(maxX-minX)
+        let height = Math.floor(maxY-minY)
         let source_sheet_object = project_memory_manager.GetInputSheetById(sheet_id)
         let source_canvas = source_sheet_object.canvas
-        target_ctx.drawImage(source_canvas,minX,minY,width,height,x,y,width,height)
+        target_ctx.drawImage(source_canvas,minX,minY,width,height,Math.floor(x),Math.floor(y),width,height)
     }
     Draw(){
         let current_frame_data = this.data.frames[this.preview.frame_index]

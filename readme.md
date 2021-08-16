@@ -49,6 +49,7 @@ copy paste images into the web page
 1. allow export of ONB compatible .animation files ✅
 1. allow each frame property to be set individually rather than applying the whole lot at once
 1. tidy styles a bit
+
 ### V1.1
 1. redoing how sprite selection and anchor point selection works
     1. either click on a spot or drag over an area to select a single frame to be added
@@ -67,3 +68,10 @@ copy paste images into the web page
 ### ...
 ### V999.9
 1. make it pretty
+
+### Quality of life (things I notice then add)
+1. Press DEL on keyboard to delete selected frames
+1. Hold CTRL on keyboard to make additional selections
+1. Add a clone animation state button which prompts you for a name and if you want to flipx
+1. Save tab minimise state to project
+1. Add collapse all tabs button
