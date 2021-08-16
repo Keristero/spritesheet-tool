@@ -40,9 +40,13 @@ copy paste images into the web page
 1. Add project loading
     - load input sheets ✅
     - load animation states ✅
-1. add image export
-    - export cramped images, or evenly spaced
-1. allow export of ONB compatible .animation files
+1. create modal object for export / detailed image import ✅
+    - Pop up modal ✅
+    - Close modal ✅
+1. add image export ✅
+    - export evenly spaced images ✅
+    - export cramped images
+1. allow export of ONB compatible .animation files ✅
 1. allow each frame property to be set individually rather than applying the whole lot at once
 1. tidy styles a bit
 ### V1.1
@@ -53,11 +57,12 @@ copy paste images into the web page
         - set other custom points
         - allow fine adjustment of origin bounds
 
+1. add custom points to exported data
+1. Add quick anchor point selection (relative to center, top, bottom, left, or right)
 1. add button to automatically import all frames from a sheet to the current animation state
 1. add button to automatically import all frames from ALL sheets
 1. make it pretty
 ### V1.3
-1. Add quick anchor point selection (relative to center, top, bottom, left, or right)
 1. Undo everything with ctrl+z!
 ### ...
 ### V999.9

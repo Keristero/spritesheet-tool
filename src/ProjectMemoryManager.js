@@ -68,6 +68,13 @@ class ProjectMemoryManager{
             this.SaveProject(this.GetProjectFilename())
         }
 
+        //Export button
+        let btn_export = create_and_append_element('button',this.element)
+        btn_export.textContent = "Export"
+        btn_export.onclick = ()=>{
+            export_modal.OpenModal()
+        }
+
     }
     TryLoadProject(){
         let storage_api_project = localStorage.getItem('project')
