@@ -73,5 +73,5 @@ copy paste images into the web page
 1. Press DEL on keyboard to delete selected frames
 1. Hold CTRL on keyboard to make additional selections
 1. Add a clone animation state button which prompts you for a name and if you want to flipx
-1. Save tab minimise state to project
+1. Save tab minimise state to project ✅
 1. Add collapse all tabs button

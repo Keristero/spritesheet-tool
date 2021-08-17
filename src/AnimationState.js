@@ -26,6 +26,9 @@ class AnimationState extends CanvasContainer{
         this.RenderSelectedFrameProps()
         this.ResetAnimation()
         this.UpdateTabTitle(this.data.state_name)
+        if(this.data.collapsed){
+            this.ToggleCollapse()
+        }
     }
     Select(){
         this.element.style.backgroundColor = "rgba(0,255,0,0.1)"
@@ -69,7 +72,6 @@ class AnimationState extends CanvasContainer{
     }
     RenderSelectedFrameProps(){
         //annoying
-        /*
         this.div_frame_settings.classList.add("hidden")
         this.p_frame_props.textContent = ""
         for(let frame_index in this.selected_frame_indexes){
@@ -77,7 +79,6 @@ class AnimationState extends CanvasContainer{
             this.p_frame_props.textContent += `${JSON.stringify(frame)}`
             this.div_frame_settings.classList.remove("hidden")
         }
-        */
     }
     GetWidestFrameWidthAnchored(){
         let max_width = 0
@@ -112,6 +113,10 @@ class AnimationState extends CanvasContainer{
             centerY: parseInt(this.canvas.height/2),
             next_frame_timeout:null
         }
+    }
+    ToggleCollapse(){
+        let collapsed = super.ToggleCollapse()
+        this.data.collapsed = collapsed
     }
     DrawIfRequired(){
         if(this.data.frames.length > 0 && this.preview && this.preview.needs_redraw){
@@ -231,10 +236,13 @@ class AnimationState extends CanvasContainer{
         let btn_apply_settings_to_frame = create_and_append_element('button',this.div_frame_settings)
         btn_apply_settings_to_frame.textContent = "Apply Settings To Frame"
         btn_apply_settings_to_frame.onclick = ()=>{
-            for(let frame_data of this.data.frames){
-                Object.assign(frame_data,this.data.default_props)
-                this.ResetAnimation()
+            for(let frame_index in this.data.frames){
+                let frame_data = this.data.frames[frame_index]
+                if(this.selected_frame_indexes.includes(frame_index)){
+                    Object.assign(frame_data,this.data.default_props)
+                }
             }
+            this.ResetAnimation()
             this.RenderSelectedFrameProps()
         }
 

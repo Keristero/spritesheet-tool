@@ -8,6 +8,9 @@ class InputSheet extends CanvasContainer{
         this.AddControlsPane()
         this.LoadImage(image_url)
         this.UpdateTabTitle(this.image_name)
+        if(this.data.collapsed){
+            this.ToggleCollapse()
+        }
     }
     async LoadImage(image_url){
         this.image = await LoadImage(image_url)
@@ -55,6 +58,10 @@ class InputSheet extends CanvasContainer{
         this.data.transparent_color = new_value
         this.DisplayTransparentColor()
         console.log(new_value)
+    }
+    ToggleCollapse(){
+        let collapsed = super.ToggleCollapse()
+        this.data.collapsed = collapsed
     }
     MouseUp(e){
         if(this.has_hover){
