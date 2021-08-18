@@ -17,6 +17,11 @@ canvas{
     background-color: white;
 }
 
+.dropzone{
+    min-height: 5em;
+    text-align: center;
+}
+
 .scrollable{
     overflow:scroll;
 }

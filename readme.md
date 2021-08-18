@@ -76,8 +76,8 @@ copy paste images into the web page
 1. Add a clone animation state button which prompts you for a name and if you want to flipx
 1. Save tab minimise state to project ✅
 1. Add collapse all tabs button
-1. Add drag and drop
-1. add paste button to checklist
+1. Add drag and drop ✅
+1. add paste button
 1. shrink frame selection canvas after removal of frames
 1. add feedback for when you add a frame
 1. add a way to reorder frames

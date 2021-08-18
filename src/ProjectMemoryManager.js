@@ -3,6 +3,8 @@ class ProjectMemoryManager{
         this.is_project_loaded = false
         this.input_sheet_objects = {}
         this.animation_state_objects = {}
+        this.drop_zone_object = new DragDropZone()
+        input_zone.appendChild(this.drop_zone_object.element)
         this.TryLoadProject()
         this.CreateElements()
     }

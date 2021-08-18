@@ -13,12 +13,16 @@ btn_add_state.onclick = () => {
 
 window.addEventListener("paste", async (clipboard_event) => {
     let clipboard_images = GetImagesFromClipboard(clipboard_event);
-    for (let image of clipboard_images) {
-        console.log(image)
+    process_input_images(clipboard_images)
+});
+
+async function process_input_images(images){
+    for (let image of images) {
+        console.log(image.name)
         let image_url = await read_file_as_image_url(image)
         project_memory_manager.NewInputSheet(image_url,image.name)
     }
-});
+}
 
 function read_file_as_image_url(file) {
     return new Promise((resolve,reject)=>{
