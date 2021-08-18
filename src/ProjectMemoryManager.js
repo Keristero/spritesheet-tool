@@ -159,11 +159,17 @@ class ProjectMemoryManager{
             console.error(`cant save a project when none is loaded`)
             return
         }
-        let project_json_string = JSON.stringify(this.memory)
-        localStorage.setItem('project',project_json_string)
-        console.log("Saved Project",this.memory)
-        if(to_file){
-            download_json_file(this.GetProjectFilename(),project_json_string)
+        try{
+            let project_json_string = JSON.stringify(this.memory)
+            localStorage.setItem('project',project_json_string)
+            console.log("Saved Project",this.memory)
+            if(to_file){
+                download_json_file(this.GetProjectFilename(),project_json_string)
+            }
+            window.alert("Project saved successfully")
+        }catch(e){
+            window.alert("Error saving project, check developer console")
+            throw(e)
         }
     }
     async NewInputSheet(image_url,image_name){

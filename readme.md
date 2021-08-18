@@ -48,6 +48,7 @@ copy paste images into the web page
     - export cramped images
 1. allow export of ONB compatible .animation files ✅
 1. allow each frame property to be set individually rather than applying the whole lot at once
+1. seperate frame selection canvas from the selection overlay (should hide selection in frame previews)
 1. tidy styles a bit
 
 ### V1.1
@@ -75,3 +76,10 @@ copy paste images into the web page
 1. Add a clone animation state button which prompts you for a name and if you want to flipx
 1. Save tab minimise state to project ✅
 1. Add collapse all tabs button
+1. Add drag and drop
+1. add paste button to checklist
+1. shrink frame selection canvas after removal of frames
+1. add feedback for when you add a frame
+1. add a way to reorder frames
+1. add feedback for save button ✅
+1. add save file button in export for the .png and .animation file
