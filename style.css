@@ -18,6 +18,7 @@ canvas{
 }
 
 .dropzone{
+    /* target area for drag and drop uploading files*/
     min-height: 5em;
     text-align: center;
 }
@@ -34,14 +35,10 @@ div{
     padding:0em;
 }
 
-.selected{
-    box-shadow:0px 0px 0px 2px blue inset;
+/* Tabs for toggling hidden sections*/
+.tab:hover{
+    background-color: rgba(100,100,100,0.3);
 }
-
-.tab :hover{
-    background-color: rgba(100,100,100,0.5);
-}
-
 .tab{
     background-color: rgba(100,100,100,0.1);
     width:100%;
@@ -50,6 +47,20 @@ div{
     outline: none;
     font-size: 1em;
     margin: 0;
+}
+.collapsed.tab:after{
+    /* add a plus symbol to collapsed tabs */
+    content: ' +';
+    font-weight: bold;
+}
+.tab:after {
+    /* add a minus symbol to expanded tabs */
+    content: ' -';
+    font-weight: bold;
+}
+.collapsed div{
+    /* hide content collapsed by tabs */
+    display:none;
 }
 
 .hidden{

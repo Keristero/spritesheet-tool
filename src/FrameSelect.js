@@ -6,6 +6,7 @@ class FrameSelect extends CanvasContainer{
         this.frame_padding_x = 16 //pixels
         this.frame_padding_y = 32
         this.RecomputeCanvasSize()
+        this.button_tab_title.textContent = "frames"
     }
     DrawIfRequired(){
         if(this.has_hover || this.left_click_held || !this.done_redraw){
@@ -60,7 +61,9 @@ class FrameSelect extends CanvasContainer{
     }
     StartSelectionBox(){
         super.StartSelectionBox()
-        this.animation_state.ClearFrameSelection()
+        if(!keyboard.CtrlIsHeld()){
+            this.animation_state.ClearFrameSelection()
+        }
     }
     FinishSelectionBox(){
         super.FinishSelectionBox()

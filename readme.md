@@ -73,11 +73,14 @@ copy paste images into the web page
 ### Quality of life (things I notice then add)
 1. Press DEL on keyboard to delete selected frames
 1. Hold CTRL on keyboard to make additional selections
+    - for Frame Select ✅
+    - for input sheets
 1. Add a clone animation state button which prompts you for a name and if you want to flipx
 1. Save tab minimise state to project ✅
 1. Add collapse all tabs button
 1. Add drag and drop ✅
 1. add paste button
+1. make purpose of tabs more obvious ✅
 1. shrink frame selection canvas after removal of frames
 1. add feedback for when you add a frame
 1. add a way to reorder frames

@@ -22,9 +22,13 @@ class CanvasContainer{
     ToggleCollapse(){
         let collapsible = this.button_tab_title.nextElementSibling
         if(collapsible.style.display == "none"){
+            this.button_tab_title.classList.remove('collapsed')
+            collapsible.classList.remove('collapsed')
             collapsible.style.display = "block"
             return false
         }else{
+            this.button_tab_title.classList.add('collapsed')
+            collapsible.classList.add('collapsed')
             collapsible.style.display = "none"
             return true
         }

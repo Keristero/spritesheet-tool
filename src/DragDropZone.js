@@ -5,7 +5,7 @@ class DragDropZone {
         this.bad_color = "rgba(255,0,0,0.1)";
     }
     PrepareHTML() {
-        this.element = document.createElement("div");
+        this.element = document.createElement("pre");
         this.element.ondrop = (e) => {
             this.Drop(e);
         };
@@ -19,7 +19,7 @@ class DragDropZone {
             this.DragLeave(e);
         };
         this.element.classList.add("dropzone");
-        this.element.textContent = `Drag and drop or paste spritesheet images here from your filesystem`
+        this.element.textContent = `Drag and drop or paste spritesheet images here from your filesystem with CTRL+V`
     }
     DragOver(event) {
         event.preventDefault();
