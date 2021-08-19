@@ -48,13 +48,13 @@ copy paste images into the web page
     - export cramped images
 1. allow export of ONB compatible .animation files ✅
 1. allow each frame property to be set individually rather than applying the whole lot at once
-1. seperate frame selection canvas from the selection overlay (should hide selection in frame previews)
+1. seperate frame selection canvas from the selection overlay (should hide selection in frame previews) ✅
 1. tidy styles a bit
 
 ### V1.1
 1. redoing how sprite selection and anchor point selection works ✅
     1. select a bunch of bounding boxes with drag select ✅
-        1. button to combine all selected bounding boxes into one big bounding box
+        1. button to combine all selected bounding boxes into one big bounding box ✅
     1. add pop out detailed frame editor with selection zone details and and anchor point selection (replace old anchor point selection)
         - set anchor point
         - set other custom points
@@ -77,18 +77,19 @@ copy paste images into the web page
 
 ### Quality of life (things I notice then add)
 1. fix selection box so that you can start selecting from outside the canvas and end selection outside the canvas
+    - for now I've made it so your selection is canceled when the mouse leaves the element, it is clearer behaviour but almost as annoying ✅
     - perhaps a way to do this would be to decouple the selection box from the canvascontainer and have it be drawn on a overlay canvas?
 1. Press DEL on keyboard to delete selected frames
-1. Hold CTRL on keyboard to make additional selections
+1. Hold CTRL on keyboard to make additional selections ✅
     - for Frame Select ✅
-    - for input sheets
+    - for input sheets ✅
 1. Add a clone animation state button which prompts you for a name and if you want to flipx
 1. Save tab minimise state to project ✅
 1. Add collapse all tabs button
 1. Add drag and drop ✅
 1. allow drag and drop insert of InputSheets from URL's
 1. make purpose of tabs more obvious ✅
-1. shrink frame selection canvas after removal of frames
+1. shrink frame selection canvas after removal of frames ✅
 1. add feedback for when you add a frame
 1. add a way to reorder frames
 1. add feedback for save button ✅

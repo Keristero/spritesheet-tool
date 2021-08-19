@@ -9,7 +9,7 @@ class FrameEditorModal extends Modal {
         this.ctx = this.canvas.getContext('2d')
 
     }
-    OpenModal() {
+    OpenModal(selected_frames) {
         super.OpenModal()
     }
 }

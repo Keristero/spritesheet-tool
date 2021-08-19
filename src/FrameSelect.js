@@ -10,7 +10,8 @@ class FrameSelect extends CanvasContainer{
     }
     DrawIfRequired(){
         if(this.has_hover || this.left_click_held || !this.done_redraw){
-            this.Draw()
+            this.DrawFrames()
+            this.DrawSelections()
         }
     }
     RecomputeCanvasSize(){
@@ -25,8 +26,7 @@ class FrameSelect extends CanvasContainer{
                 max_height = height
             }
         }
-        this.canvas.width = total_width
-        this.canvas.height = max_height+this.frame_padding_y*2
+        this.ResizeCanvas(total_width,max_height+this.frame_padding_y*2)
         this.done_redraw = false
     }
     CheckForSelection(selected_region){
@@ -74,25 +74,36 @@ class FrameSelect extends CanvasContainer{
         console.log("selected frames",selected_frames)
         this.ClearSelectionBox()
     }
-    Draw(){
+    DrawFrames(){
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
         //Draw frames
         let x = this.frame_padding_x
         let y = this.frame_padding_y
-        this.ctx.fillStyle = 'rgba(0,0,255,0.1)'
-        this.ctx.strokeStyle = 'rgba(0,0,255,1)'
         for(let frame_index in this.animation_state.data.frames){
             let frame_data = this.animation_state.data.frames[frame_index]
             let width = (frame_data.source_bounds.maxX-frame_data.source_bounds.minX)
             let height = (frame_data.source_bounds.maxY-frame_data.source_bounds.minY)
             this.animation_state.DrawFrameData(frame_data,this.ctx,x,y)
+            x += (frame_data.source_bounds.maxX-frame_data.source_bounds.minX)+this.frame_padding_x
+        }
+    }
+    DrawSelections(){
+        this.overlay_ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
+        //Draw frames
+        let x = this.frame_padding_x
+        let y = this.frame_padding_y
+        this.overlay_ctx.fillStyle = 'rgba(0,0,255,0.1)'
+        this.overlay_ctx.strokeStyle = 'rgba(0,0,255,1)'
+        for(let frame_index in this.animation_state.data.frames){
+            let frame_data = this.animation_state.data.frames[frame_index]
+            let width = (frame_data.source_bounds.maxX-frame_data.source_bounds.minX)
+            let height = (frame_data.source_bounds.maxY-frame_data.source_bounds.minY)
             if(this.animation_state.selected_frame_indexes[frame_index]){
-                this.ctx.fillRect(x,y,width,height)
-                this.ctx.strokeRect(x,y,width,height)
+                this.overlay_ctx.fillRect(x,y,width,height)
+                this.overlay_ctx.strokeRect(x,y,width,height)
             }
             x += (frame_data.source_bounds.maxX-frame_data.source_bounds.minX)+this.frame_padding_x
         }
-        
         this.DrawSelectionBox()
     }
 }

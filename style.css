@@ -17,14 +17,25 @@ canvas{
     background-color: white;
 }
 
+.canvas_container{
+    position: relative;
+}
+
+.canvas_container > canvas{
+    position:absolute;
+    top:0px;
+    left:0px;
+}
+
+.overlay{
+    z-index: 2;
+    background-color: rgba(0,0,0,0);
+}
+
 .dropzone{
     /* target area for drag and drop uploading files*/
     min-height: 5em;
     text-align: center;
-}
-
-.scrollable{
-    overflow:scroll;
 }
 
 div{

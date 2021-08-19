@@ -101,8 +101,7 @@ class AnimationState extends CanvasContainer{
         return max_height
     }
     ResetAnimation(){
-        this.canvas.width = this.GetWidestFrameWidthAnchored()*2
-        this.canvas.height = this.GetTallestFrameHeightAnchored()*2
+        this.ResizeCanvas(this.GetWidestFrameWidthAnchored()*2,this.GetTallestFrameHeightAnchored()*2)
         if(this.preview && this.preview.next_frame_timeout){
             clearTimeout(this.preview.next_frame_timeout)
         }
@@ -231,6 +230,7 @@ class AnimationState extends CanvasContainer{
         btn_remove_frame.textContent = "Remove Frame"
         btn_remove_frame.onclick = ()=>{
             this.DeleteSelectedFrames()
+            this.frame_select.RecomputeCanvasSize()
         }
 
         let btn_apply_settings_to_frame = create_and_append_element('button',this.div_frame_settings)

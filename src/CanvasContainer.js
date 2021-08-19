@@ -10,14 +10,27 @@ class CanvasContainer{
         }
         this.contents = create_and_append_element('div',this.element)
         this.container = create_and_append_element('div',this.contents)
+        this.container.classList.add('canvas_container')
         this.container.classList.add('scrollable')
         this.canvas = create_and_append_element('canvas',this.container)
         this.canvas.onselectstart = ()=>{return false}//supress selection
+        this.overlay_canvas = create_and_append_element('canvas',this.container)
+        this.overlay_canvas.onselectstart = ()=>{return false}//supress selection
+        this.overlay_canvas.classList.add('overlay')
         this.ctx = this.canvas.getContext('2d')
+        this.overlay_ctx = this.overlay_canvas.getContext('2d')
         this.hover_pos={x:0,y:0}
         this.has_hover = false
         this.done_redraw = false
         this.AddMouseEvents()
+    }
+    ResizeCanvas(width,height){
+        this.container.style.width = width
+        this.container.style.height = height
+        this.overlay_canvas.width = width
+        this.overlay_canvas.height = height
+        this.canvas.width = width
+        this.canvas.height = height
     }
     ToggleCollapse(){
         let collapsible = this.button_tab_title.nextElementSibling
@@ -94,10 +107,16 @@ class CanvasContainer{
     }
     DrawSelectionBox(){
         if(this.drag_selection_start && this.drag_selection_end){
-            this.ctx.fillStyle = 'rgba(0,0,255,0.1)'
+            this.overlay_ctx.fillStyle = 'rgba(0,0,255,0.1)'
             let {x,y,width,height} = this.NormalizeSelectionBox()
-            this.ctx.fillRect(x,y,width,height)
+            this.overlay_ctx.fillRect(x,y,width,height)
         }
+    }
+    MouseOut(e){
+        this.ClearSelectionBox()
+    }
+    MouseIn(e){
+        this.ClearSelectionBox()
     }
     MouseMove(e){
         let x = e.offsetX
@@ -111,23 +130,26 @@ class CanvasContainer{
         }
     }
     AddMouseEvents(){
-        this.canvas.addEventListener('mousemove',(e)=>{
+        this.overlay_canvas.addEventListener('mousemove',(e)=>{
             this.MouseMove(e)
         })
-        this.canvas.onmouseover = (e)=>{
+        this.overlay_canvas.onmouseover = (e)=>{
             this.has_hover = true
         }
-        this.canvas.onmouseout = (e)=>{
+        this.overlay_canvas.onmouseout = (e)=>{
             this.has_hover = false
             this.done_redraw = false
         }
-        this.canvas.addEventListener('click',(e)=>{
+        this.overlay_canvas.addEventListener('click',(e)=>{
             this.MouseClick(e)
         })
-        this.canvas.addEventListener('mousedown',(e)=>{
+        this.overlay_canvas.addEventListener('mousedown',(e)=>{
             this.MouseDown(e)
         })
-        this.canvas.addEventListener('mouseup',(e)=>{
+        this.overlay_canvas.addEventListener('mouseout',(e)=>{
+            this.MouseOut(e)
+        })
+        this.overlay_canvas.addEventListener('mouseup',(e)=>{
             this.MouseUp(e)
         })
     }

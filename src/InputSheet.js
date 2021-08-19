@@ -15,13 +15,19 @@ class InputSheet extends CanvasContainer{
     }
     async LoadImage(image_url){
         this.image = await LoadImage(image_url)
-        this.canvas.width = this.image.width
-        this.canvas.height = this.image.height
+        this.ResizeCanvas(this.image.width,this.image.height)
         this.ctx.imageSmoothingEnabled = false
         this.FillImage()
         this.image_loaded = true
     }
     AddControlsPane(){
+
+        let btn_combine_selection = create_and_append_element('button',this.contents)
+        btn_combine_selection.textContent = "Combine Selection"
+        btn_combine_selection.onclick=()=>{
+            this.CombineSelection()
+        }
+
         this.div_settings = create_and_append_element('div',this.contents)
 
         let p_transparent_color = create_and_append_element('p',this.div_settings)
@@ -33,6 +39,33 @@ class InputSheet extends CanvasContainer{
         let btn_delete_sheet = create_and_append_element('button',this.div_settings)
         btn_delete_sheet.textContent = "Remove Input Sheet"
         btn_delete_sheet.onclick = ()=>{this.DeleteSelf()}
+    }
+    CombineSelection(){
+        let new_bounds={
+            maxX:0,
+            maxY:0,
+            minX:this.canvas.width,
+            minY:this.canvas.height
+        }
+        for(let bounds of this.selected_bounds){
+            console.log(bounds)
+            if(bounds.maxX > new_bounds.maxX){
+                new_bounds.maxX = bounds.maxX
+            }
+            if(bounds.minX < new_bounds.minX){
+                new_bounds.minX = bounds.minX
+            }
+            if(bounds.maxY > new_bounds.maxY){
+                new_bounds.maxY = bounds.maxY
+            }
+            if(bounds.minY < new_bounds.minY){
+                new_bounds.minY = bounds.minY
+            }
+        }
+        this.ClearSelectedBounds()
+        console.log(new_bounds)
+        this.AddSelectedBounds(new_bounds)
+        this.done_redraw = false
     }
     FillImage(){
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
@@ -47,7 +80,6 @@ class InputSheet extends CanvasContainer{
             return this.data.transparent_color
         }else{
             if(this.image_loaded){
-                this.FillImage()
                 let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
                 let pixel_color = getPixel(image_data,0,0)
             }else{
@@ -58,7 +90,6 @@ class InputSheet extends CanvasContainer{
     set transparent_color(new_value){
         this.data.transparent_color = new_value
         this.DisplayTransparentColor()
-        console.log(new_value)
     }
     ToggleCollapse(){
         let collapsed = super.ToggleCollapse()
@@ -68,7 +99,15 @@ class InputSheet extends CanvasContainer{
         let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
         let {new_box,latest_history} = find_transparent_bounding_box(image_data,this.hover_pos.x,this.hover_pos.y,this.canvas.width,this.canvas.height,this.max_distance,this.transparent_color)
         if(!this.BoundsAreAlreadySelected(new_box)){
-            this.selected_bounds.push(new_box)
+            this.AddSelectedBounds(new_box)
+        }
+    }
+    AddSelectedBounds(new_bounds){
+        if(new_bounds.minX == new_bounds.maxX || new_bounds.minY == new_bounds.maxY){
+            return
+        }
+        if(!this.BoundsAreAlreadySelected(new_bounds)){
+            this.selected_bounds.push(new_bounds)
         }
     }
     StartSelectionBox(){
@@ -85,11 +124,13 @@ class InputSheet extends CanvasContainer{
     }
     Draw(){
         if(this.image_loaded){
-            this.FillImage()
+            this.overlay_ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
+            this.overlay_ctx.fillStyle = 'rgba(0,0,255,0.1)'
+            this.overlay_ctx.strokeStyle = 'rgba(0,0,255,1)'
             for(let bounds of this.selected_bounds){
-                this.ctx.fillStyle = 'rgba(0,0,255,0.1)'
                 let {minX,minY,maxX,maxY} = bounds
-                this.ctx.fillRect(minX,minY,(maxX-minX)+1,(maxY-minY)+1)
+                this.overlay_ctx.fillRect(minX,minY,(maxX-minX)+1,(maxY-minY)+1)
+                this.overlay_ctx.strokeRect(minX,minY,(maxX-minX)+1,(maxY-minY)+1)
             }
             this.DrawSelectionBox()
             return true
@@ -100,15 +141,12 @@ class InputSheet extends CanvasContainer{
         this.selected_bounds = []
     }
     FindBoundingBoxs(){
-        this.FillImage()
         let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
         let {x,y} = this.hover_pos
         let selected_region = this.NormalizeSelectionBox()
         let new_bounds = find_multiple_bounding_boxes(image_data,selected_region.minX,selected_region.minY,selected_region.maxX,selected_region.maxY,this.canvas.width,this.canvas.height,inp_selection_radius.value,this.transparent_color)
         for(let bounds of new_bounds){
-            if(!this.BoundsAreAlreadySelected(bounds)){
-                this.selected_bounds.push(bounds)
-            }
+            this.AddSelectedBounds(bounds)
         }
     }
     BoundsAreAlreadySelected(bounds){
