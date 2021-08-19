@@ -5,6 +5,7 @@ class InputSheet extends CanvasContainer{
         this.data = data
         this.image_loaded = false
         this.image_name = image_name
+        this.selected_bounds = []
         this.AddControlsPane()
         this.LoadImage(image_url)
         this.UpdateTabTitle(this.image_name)
@@ -63,70 +64,60 @@ class InputSheet extends CanvasContainer{
         let collapsed = super.ToggleCollapse()
         this.data.collapsed = collapsed
     }
-    MouseUp(e){
-        if(this.has_hover){
-            if(e.button == 0){
-                //left click
-                this.moving_anchor = false
-            }else if(e.button == 1){
-                //middle click
-                this.FillImage()
-                let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
-                let pixel_color = getPixel(image_data,this.hover_pos.x,this.hover_pos.y)
-                this.transparent_color = (pixel_color)
-            }
+    FindBoundingBox(){
+        let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
+        let {new_box,latest_history} = find_transparent_bounding_box(image_data,this.hover_pos.x,this.hover_pos.y,this.canvas.width,this.canvas.height,this.max_distance,this.transparent_color)
+        if(!this.BoundsAreAlreadySelected(new_box)){
+            this.selected_bounds.push(new_box)
         }
     }
-    MouseDown(e){
-        if(this.has_hover){
-            if(e.button == 0){
-                //left click
-                this.FillImage()
-                if(this.bounds && point_in_bounds(this.hover_pos.x,this.hover_pos.y,this.bounds)){
-                    project_memory_manager.AddFrameToSelectedState(this,this.bounds,this.anchor)
-                }else{
-                    this.FindBoundingBox()
-                    this.moving_anchor = true
-                }
-            }
+    StartSelectionBox(){
+        super.StartSelectionBox()
+        if(!keyboard.CtrlIsHeld()){
+            this.ClearSelectedBounds()
         }
+        this.FindBoundingBox()
     }
-    MouseMove(e){
-        super.MouseMove(e)
-        if(this.moving_anchor){
-            this.anchor = {x:this.hover_pos.x,y:this.hover_pos.y}
-        }
+    FinishSelectionBox(){
+        super.FinishSelectionBox()
+        this.FindBoundingBoxs()
+        this.ClearSelectionBox()
     }
     Draw(){
-        console.log('drew')
         if(this.image_loaded){
             this.FillImage()
-            if(this.bounds){
+            for(let bounds of this.selected_bounds){
                 this.ctx.fillStyle = 'rgba(0,0,255,0.1)'
-                let {minX,minY,maxX,maxY} = this.bounds
+                let {minX,minY,maxX,maxY} = bounds
                 this.ctx.fillRect(minX,minY,(maxX-minX)+1,(maxY-minY)+1)
             }
-            if(this.anchor && this.bounds){
-                this.DrawAnchor()
-            }
+            this.DrawSelectionBox()
             return true
         }
         return false
     }
-    DrawAnchor(){
-        this.ctx.fillStyle = "rgba(255,0,0,1)"
-        if(this.moving_anchor){
-            this.ctx.fillStyle = "rgba(255,0,0,0.5)"
-        }
-        this.ctx.fillRect(this.anchor.x-5,this.anchor.y,11,1)
-        this.ctx.fillRect(this.anchor.x,this.anchor.y-5,1,11)
+    ClearSelectedBounds(){
+        this.selected_bounds = []
     }
-    FindBoundingBox(){
+    FindBoundingBoxs(){
         this.FillImage()
         let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
         let {x,y} = this.hover_pos
-        this.bounds = find_transparent_bounding_box(image_data,x,y,this.canvas.width,this.canvas.height,inp_selection_radius.value,this.transparent_color)
-        console.log(this.bounds)
+        let selected_region = this.NormalizeSelectionBox()
+        let new_bounds = find_multiple_bounding_boxes(image_data,selected_region.minX,selected_region.minY,selected_region.maxX,selected_region.maxY,this.canvas.width,this.canvas.height,inp_selection_radius.value,this.transparent_color)
+        for(let bounds of new_bounds){
+            if(!this.BoundsAreAlreadySelected(bounds)){
+                this.selected_bounds.push(bounds)
+            }
+        }
+    }
+    BoundsAreAlreadySelected(bounds){
+        for(let existing_bounds of this.selected_bounds){
+            if(existing_bounds.minX == bounds.minX && existing_bounds.minY == bounds.minY && existing_bounds.maxX == bounds.maxX && existing_bounds.maxY == bounds.maxY){
+                return true
+            }
+        }
+        return false
     }
 }
 
@@ -139,9 +130,43 @@ function point_in_bounds(x,y,bounds){
     return false
 }
 
-function find_transparent_bounding_box(image_data,startX,startY,image_width,image_height,max_distance=1,transparent_color=[0,0,0,0]){
-    let stack = [{x:startX,y:startY,d:0}]
+function find_multiple_bounding_boxes(image_data,startX,startY,endX,endY,image_width,image_height,max_distance=1,transparent_color=[0,0,0,0]){
     let history = {}
+    let boxes = []
+    for(let x = startX; x < endX; x++){
+        for(let y = startY; y < endY; y++){
+            let pixel = getPixel(image_data,x,y)
+            if(history[x] && history[x][y]){
+                //If pixel has already been visited
+                continue
+            }
+            let t = transparent_color
+            if (pixel[0] == t[0] && pixel[1] == t[1] && pixel[2] == t[2] && pixel[3] == t[3]){
+                //If pixel is a transparent color
+                continue
+            }
+            let {new_box,latest_history} = find_transparent_bounding_box(image_data,x,y,image_width,image_height,max_distance,transparent_color,history)
+            history = latest_history
+            //check if box is already in boxes, otherwise add it
+            let box_already_exists = function(boxes,new_box){
+                for(let box of boxes){
+                    if(box.minX == new_box.minX && box.minY == new_box.minY && box.maxX == new_box.maxX && box.maxY == new_box.maxY){
+                        return true
+                    }
+                }
+                return false
+            }
+            if(!box_already_exists(boxes,new_box)){
+                boxes.push(new_box)
+            }
+        }
+    }
+    return boxes
+}
+
+function find_transparent_bounding_box(image_data,startX,startY,image_width,image_height,max_distance=1,transparent_color=[0,0,0,0],previous_history){
+    let stack = [{x:startX,y:startY,d:0}]
+    let latest_history = previous_history ?? {}
     let minX = startX
     let minY = startY
     let maxX = startX
@@ -152,11 +177,11 @@ function find_transparent_bounding_box(image_data,startX,startY,image_width,imag
         if(x < 0 || x > image_width || y < 0 || y > image_height){
             return
         }
-        if(!history[x]){
-            history[x] = {}
+        if(!latest_history[x]){
+            latest_history[x] = {}
         }
-        if(!history[x][y]){
-            history[x][y] = true
+        if(!latest_history[x][y]){
+            latest_history[x][y] = true
             stack.push({x:x,y:y,d:d})
         }
     }
@@ -186,7 +211,8 @@ function find_transparent_bounding_box(image_data,startX,startY,image_width,imag
             add_tile_to_stack(x,y-1,d+1)
         }
     }
-    return {minX,minY,maxX,maxY}
+    let new_box = {minX,minY,maxX,maxY}
+    return {new_box,latest_history}
 }
 
 /* Layer 1: Interacting with ImageData */

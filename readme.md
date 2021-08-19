@@ -52,15 +52,20 @@ copy paste images into the web page
 1. tidy styles a bit
 
 ### V1.1
-1. redoing how sprite selection and anchor point selection works
-    1. either click on a spot or drag over an area to select a single frame to be added
+1. redoing how sprite selection and anchor point selection works ✅
+    1. select a bunch of bounding boxes with drag select ✅
+        1. button to combine all selected bounding boxes into one big bounding box
     1. add pop out detailed frame editor with selection zone details and and anchor point selection (replace old anchor point selection)
         - set anchor point
         - set other custom points
         - allow fine adjustment of origin bounds
 
 1. add custom points to exported data
+    - allow configuration of custom points
+    - allow export of custom points
+    - allow editing of custom points
 1. Add quick anchor point selection (relative to center, top, bottom, left, or right)
+    - for new frames
 1. add button to automatically import all frames from a sheet to the current animation state
 1. add button to automatically import all frames from ALL sheets
 1. make it pretty
@@ -71,6 +76,8 @@ copy paste images into the web page
 1. make it pretty
 
 ### Quality of life (things I notice then add)
+1. fix selection box so that you can start selecting from outside the canvas and end selection outside the canvas
+    - perhaps a way to do this would be to decouple the selection box from the canvascontainer and have it be drawn on a overlay canvas?
 1. Press DEL on keyboard to delete selected frames
 1. Hold CTRL on keyboard to make additional selections
     - for Frame Select ✅
@@ -79,7 +86,7 @@ copy paste images into the web page
 1. Save tab minimise state to project ✅
 1. Add collapse all tabs button
 1. Add drag and drop ✅
-1. add paste button
+1. allow drag and drop insert of InputSheets from URL's
 1. make purpose of tabs more obvious ✅
 1. shrink frame selection canvas after removal of frames
 1. add feedback for when you add a frame
