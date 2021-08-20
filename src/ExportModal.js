@@ -104,7 +104,7 @@ class ExportModal extends Modal {
                     let anchored_x = half_max_width + (x - anchor_x)
                     let anchored_y = half_max_height + (y - anchor_y)
                     //Draw frames to canvas
-                    state_object.DrawFrameData(frame, this.ctx, anchored_x, anchored_y)
+                    draw_frame_data(frame, this.ctx, anchored_x, anchored_y)
                     output_data[state_id].frames.push({
                         duration: frame.duration,
                         x: anchored_x,

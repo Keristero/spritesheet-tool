@@ -56,6 +56,9 @@ copy paste images into the web page
     1. select a bunch of bounding boxes with drag select ✅
         1. button to combine all selected bounding boxes into one big bounding box ✅
     1. add pop out detailed frame editor with selection zone details and and anchor point selection (replace old anchor point selection)
+        - title of modal is based on what you are currently doing (importing frames, editing frames, etc
+        - list of frames you can select to modify
+        - when you are importing frames and you press the import button, remove the frame from the list and select the next one
         - set anchor point
         - set other custom points
         - allow fine adjustment of origin bounds

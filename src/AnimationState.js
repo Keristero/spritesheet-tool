@@ -122,21 +122,12 @@ class AnimationState extends CanvasContainer{
             this.Draw()
         }
     }
-    DrawFrameData(frame_data,target_ctx,x,y){
-        let {minX, minY, maxX, maxY} = frame_data.source_bounds
-        let {sheet_id} = frame_data
-        let width = Math.floor(maxX-minX)
-        let height = Math.floor(maxY-minY)
-        let source_sheet_object = project_memory_manager.GetInputSheetById(sheet_id)
-        let source_canvas = source_sheet_object.canvas
-        target_ctx.drawImage(source_canvas,minX,minY,width,height,Math.floor(x),Math.floor(y),width,height)
-    }
     Draw(){
         let current_frame_data = this.data.frames[this.preview.frame_index]
         let x = this.preview.centerX - (current_frame_data.anchor_pos.x-current_frame_data.source_bounds.minX)
         let y = this.preview.centerY - (current_frame_data.anchor_pos.y-current_frame_data.source_bounds.minY)
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
-        this.DrawFrameData(current_frame_data,this.ctx,x,y)
+        draw_frame_data(current_frame_data,this.ctx,x,y)
 
         this.preview.needs_redraw = false
         this.preview.next_frame_timeout = setTimeout(()=>{

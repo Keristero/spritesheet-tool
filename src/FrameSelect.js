@@ -83,7 +83,7 @@ class FrameSelect extends CanvasContainer{
             let frame_data = this.animation_state.data.frames[frame_index]
             let width = (frame_data.source_bounds.maxX-frame_data.source_bounds.minX)
             let height = (frame_data.source_bounds.maxY-frame_data.source_bounds.minY)
-            this.animation_state.DrawFrameData(frame_data,this.ctx,x,y)
+            draw_frame_data(frame_data,this.ctx,x,y)
             x += (frame_data.source_bounds.maxX-frame_data.source_bounds.minX)+this.frame_padding_x
         }
     }

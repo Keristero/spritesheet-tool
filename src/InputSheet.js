@@ -28,6 +28,21 @@ class InputSheet extends CanvasContainer{
             this.CombineSelection()
         }
 
+        let btn_add_selected_frames = create_and_append_element('button',this.contents)
+        btn_add_selected_frames.textContent = "Add selected frames to animation"
+        btn_add_selected_frames.onclick=()=>{
+            if(this.selected_bounds.length === 0){
+                window.alert("No frames selected")
+                return
+            }
+            if(project_memory_manager.memory.selected_animation_state_id == null){
+                window.alert("No animation state selected")
+                return
+            }
+            console.log(project_memory_manager.memory.selected_animation_state_id)
+            frame_editor_modal.ImportFrames(this.selected_bounds)
+        }
+
         this.div_settings = create_and_append_element('div',this.contents)
 
         let p_transparent_color = create_and_append_element('p',this.div_settings)
