@@ -9,6 +9,7 @@ class CanvasContainer{
             this.ToggleCollapse()
         }
         this.contents = create_and_append_element('div',this.element)
+        this.contents.classList.add('center')
         this.container = create_and_append_element('div',this.contents)
         this.container.classList.add('canvas_container')
         this.container.classList.add('scrollable')
@@ -18,6 +19,7 @@ class CanvasContainer{
         this.overlay_canvas.onselectstart = ()=>{return false}//supress selection
         this.overlay_canvas.classList.add('overlay')
         this.ctx = this.canvas.getContext('2d')
+        this.ctx.imageSmoothingEnabled = false
         this.overlay_ctx = this.overlay_canvas.getContext('2d')
         this.hover_pos={x:0,y:0}
         this.has_hover = false

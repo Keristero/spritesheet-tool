@@ -40,7 +40,19 @@ class InputSheet extends CanvasContainer{
                 return
             }
             console.log(project_memory_manager.memory.selected_animation_state_id)
-            frame_editor_modal.ImportFrames(this.selected_bounds)
+            let new_frames = []
+            for(let bounds of this.selected_bounds){
+                let new_frame_data = {
+                    sheet_id:this.id,
+                    source_bounds:bounds,
+                    anchor_pos:null,
+                    duration:100,
+                    flip_x:false,
+                    flip_y:false
+                }
+                new_frames.push(new_frame_data)
+            }
+            frame_editor_modal.ImportFrames(new_frames)
         }
 
         this.div_settings = create_and_append_element('div',this.contents)

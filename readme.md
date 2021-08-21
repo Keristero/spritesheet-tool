@@ -45,13 +45,11 @@ copy paste images into the web page
     - Close modal ✅
 1. add image export ✅
     - export evenly spaced images ✅
-    - export cramped images
 1. allow export of ONB compatible .animation files ✅
-1. allow each frame property to be set individually rather than applying the whole lot at once
 1. seperate frame selection canvas from the selection overlay (should hide selection in frame previews) ✅
-1. tidy styles a bit
 
 ### V1.1
+1. decouple frame select from animation state ✅
 1. redoing how sprite selection and anchor point selection works ✅
     1. select a bunch of bounding boxes with drag select ✅
         1. button to combine all selected bounding boxes into one big bounding box ✅
@@ -69,10 +67,15 @@ copy paste images into the web page
     - allow editing of custom points
 1. Add quick anchor point selection (relative to center, top, bottom, left, or right)
     - for new frames
+
+1. Add a clone animation state button which prompts you for a new name, and if you want to flip the X or Y
+1. Dont copy trasparent color pixels into imported frames
+1. ensure pixels are not being cut off on the far right and bottom of selection
 1. add button to automatically import all frames from a sheet to the current animation state
 1. add button to automatically import all frames from ALL sheets
 1. make it pretty
 ### V1.3
+1. export cramped images
 1. Undo everything with ctrl+z!
 ### ...
 ### V999.9
@@ -86,7 +89,6 @@ copy paste images into the web page
 1. Hold CTRL on keyboard to make additional selections ✅
     - for Frame Select ✅
     - for input sheets ✅
-1. Add a clone animation state button which prompts you for a name and if you want to flipx
 1. Save tab minimise state to project ✅
 1. Add collapse all tabs button
 1. Add drag and drop ✅

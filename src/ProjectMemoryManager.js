@@ -249,7 +249,7 @@ class ProjectMemoryManager{
             return;
         }
         let selected_animation_state = this.animation_state_objects[this.memory.selected_animation_state_id]
-        selected_animation_state.AddFrame(source_image,source_bounds,anchor_pos)
+        selected_animation_state.AddFrame(source_image.id,source_bounds,anchor_pos)
     }
     GetInputSheetById(id){
         if(this.input_sheet_objects[id]){

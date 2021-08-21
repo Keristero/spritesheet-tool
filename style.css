@@ -13,6 +13,7 @@ body{
 }
 
 canvas{
+    image-rendering: crisp-edges;
     image-rendering:pixelated;
     background-color: white;
 }
@@ -36,6 +37,11 @@ canvas{
     /* target area for drag and drop uploading files*/
     min-height: 5em;
     text-align: center;
+}
+
+.center{
+    text-align: center;
+    align-content: center;
 }
 
 div{

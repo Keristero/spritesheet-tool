@@ -1,6 +1,6 @@
 class Modal{
     constructor(){
-        this.PrepareHTML()
+        this.is_open = false
     }
     PrepareHTML(){
         this.element = document.createElement('dialog')
@@ -12,8 +12,10 @@ class Modal{
     }
     CloseModal(){
         this.element.close()
+        this.is_open = false
     }
     OpenModal(){
         this.element.showModal()
+        this.is_open = true
     }
 }

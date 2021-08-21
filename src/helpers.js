@@ -40,12 +40,14 @@ function rect_overlap(region1,region2){
     return false
 }
 
-function draw_frame_data(frame_data,target_ctx,x,y){
+function draw_frame_data(frame_data,target_ctx,x,y,t_width,t_height){
     let {minX, minY, maxX, maxY} = frame_data.source_bounds
     let {sheet_id} = frame_data
     let width = Math.floor(maxX-minX)
     let height = Math.floor(maxY-minY)
+    let target_width = t_width ?? width
+    let target_height = t_height ?? height
     let source_sheet_object = project_memory_manager.GetInputSheetById(sheet_id)
     let source_canvas = source_sheet_object.canvas
-    target_ctx.drawImage(source_canvas,minX,minY,width,height,Math.floor(x),Math.floor(y),width,height)
+    target_ctx.drawImage(source_canvas,minX,minY,width,height,Math.floor(x),Math.floor(y),target_width,target_height)
 }

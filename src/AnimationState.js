@@ -21,9 +21,8 @@ class AnimationState extends CanvasContainer{
         this.AddControlsPane()
         this.selected = false
         this.selected_frame_indexes = []
-        this.frame_select = new FrameSelect({id:0,animation_state:this})
+        this.frame_select = new FrameSelect({id:0,selected_frame_indexes:this.selected_frame_indexes,frames:this.data.frames})
         this.div_settings.insertBefore(this.frame_select.element,this.div_frame_settings)
-        this.RenderSelectedFrameProps()
         this.ResetAnimation()
         this.UpdateTabTitle(this.data.state_name)
         if(this.data.collapsed){
@@ -38,9 +37,9 @@ class AnimationState extends CanvasContainer{
         this.element.style.backgroundColor = "rgba(0,0,0,0)"
         this.selected = false
     }
-    AddFrame(source_input_sheet_object,source_bounds,anchor_pos){
+    AddFrame(source_input_sheet_id,source_bounds,anchor_pos){
         let new_frame_data = {
-            sheet_id:source_input_sheet_object.id,
+            sheet_id:source_input_sheet_id,
             source_bounds:source_bounds,
             anchor_pos:anchor_pos,
             duration:this.data.default_props.duration,
@@ -54,7 +53,6 @@ class AnimationState extends CanvasContainer{
     }
     ClearFrameSelection(){
         this.selected_frame_indexes = {}
-        this.RenderSelectedFrameProps()
     }
     DeleteSelectedFrames(){
         let frames = this.GetSelectedFrames()
@@ -67,17 +65,6 @@ class AnimationState extends CanvasContainer{
     AddToSelection(frame_index){
         if(this.data.frames[frame_index]){
             this.selected_frame_indexes[frame_index] = true
-        }
-        this.RenderSelectedFrameProps()
-    }
-    RenderSelectedFrameProps(){
-        //annoying
-        this.div_frame_settings.classList.add("hidden")
-        this.p_frame_props.textContent = ""
-        for(let frame_index in this.selected_frame_indexes){
-            let frame = this.data.frames[frame_index]
-            this.p_frame_props.textContent += `${JSON.stringify(frame)}`
-            this.div_frame_settings.classList.remove("hidden")
         }
     }
     GetWidestFrameWidthAnchored(){
@@ -224,17 +211,10 @@ class AnimationState extends CanvasContainer{
             this.frame_select.RecomputeCanvasSize()
         }
 
-        let btn_apply_settings_to_frame = create_and_append_element('button',this.div_frame_settings)
-        btn_apply_settings_to_frame.textContent = "Apply Settings To Frame"
-        btn_apply_settings_to_frame.onclick = ()=>{
-            for(let frame_index in this.data.frames){
-                let frame_data = this.data.frames[frame_index]
-                if(this.selected_frame_indexes.includes(frame_index)){
-                    Object.assign(frame_data,this.data.default_props)
-                }
-            }
-            this.ResetAnimation()
-            this.RenderSelectedFrameProps()
+        let btn_edit_frame = create_and_append_element('button',this.div_frame_settings)
+        btn_edit_frame.textContent = "Edit Frame"
+        btn_edit_frame.onclick = ()=>{
+            frame_editor_modal.EditFrames(this.data.frames)
         }
 
         this.p_frame_props = create_and_append_element('p',this.div_frame_settings)

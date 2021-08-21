@@ -51,6 +51,7 @@ function draw() {
         animation_state.DrawIfRequired();
         animation_state.frame_select.DrawIfRequired();
     }
+    frame_editor_modal.DrawIfRequired()
 }
 
 function GetImagesFromClipboard(e) {
