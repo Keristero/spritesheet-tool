@@ -53,11 +53,11 @@ copy paste images into the web page
 1. redoing how sprite selection and anchor point selection works ✅
     1. select a bunch of bounding boxes with drag select ✅
         1. button to combine all selected bounding boxes into one big bounding box ✅
-    1. add pop out detailed frame editor with selection zone details and and anchor point selection (replace old anchor point selection)
-        - title of modal is based on what you are currently doing (importing frames, editing frames, etc
-        - list of frames you can select to modify
-        - when you are importing frames and you press the import button, remove the frame from the list and select the next one
-        - set anchor point
+    1. add pop out detailed frame editor with selection zone details and and anchor point selection (replace old anchor point selection) ✅
+        - title of modal is based on what you are currently doing (importing frames, editing frames, etc)
+        - list of frames you can select to modify ✅
+        - when you are importing frames and you press the import button, remove the frame from the list and select the next one ✅
+        - set anchor point ✅
         - set other custom points
         - allow fine adjustment of origin bounds
 
@@ -69,6 +69,7 @@ copy paste images into the web page
     - for new frames
 
 1. Add a clone animation state button which prompts you for a new name, and if you want to flip the X or Y
+    1. cant be edited, its a flipped clone of another state
 1. Dont copy trasparent color pixels into imported frames
 1. ensure pixels are not being cut off on the far right and bottom of selection
 1. add button to automatically import all frames from a sheet to the current animation state

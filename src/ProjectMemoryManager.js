@@ -8,6 +8,9 @@ class ProjectMemoryManager{
         this.TryLoadProject()
         this.CreateElements()
     }
+    get selected_animation_state_object(){
+        return this.animation_state_objects[this.memory.selected_animation_state_id]
+    }
     CreateElements(){
         let div_settings = document.getElementById('settings')
         this.element = create_and_append_element('div',div_settings)

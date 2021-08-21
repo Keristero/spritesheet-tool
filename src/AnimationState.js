@@ -37,15 +37,7 @@ class AnimationState extends CanvasContainer{
         this.element.style.backgroundColor = "rgba(0,0,0,0)"
         this.selected = false
     }
-    AddFrame(source_input_sheet_id,source_bounds,anchor_pos){
-        let new_frame_data = {
-            sheet_id:source_input_sheet_id,
-            source_bounds:source_bounds,
-            anchor_pos:anchor_pos,
-            duration:this.data.default_props.duration,
-            flip_x:this.data.default_props.flip_x,
-            flip_y:this.data.default_props.flip_y
-        }
+    AddFrame(new_frame_data){
         console.log('Added Frame',new_frame_data)
         this.data.frames.push(new_frame_data)
         this.ResetAnimation()
@@ -145,61 +137,6 @@ class AnimationState extends CanvasContainer{
             console.log(this.data.state_name)
             this.UpdateTabTitle(this.data.state_name)
         }
-
-        let p_frame_duration = create_and_append_element('p',this.div_settings)
-        p_frame_duration.textContent = "Frame Duration (seconds)"
-
-        let inp_frame_duration = create_and_append_element('input',p_frame_duration)
-        inp_frame_duration.type = "number"
-        inp_frame_duration.value = this.data.default_props.duration
-        inp_frame_duration.onchange = (e)=>{
-            this.data.default_props.duration = parseFloat(inp_frame_duration.value)
-        }
-
-        let p_flip_x = create_and_append_element('p',this.div_settings)
-        p_flip_x.textContent = "Flip horizontally"
-
-        let chk_flip_x = create_and_append_element('input',p_flip_x)
-        chk_flip_x.type = "checkbox"
-        chk_flip_x.checked = this.data.default_props.flip_x
-        chk_flip_x.onchange = (e)=>{
-            this.data.default_props.flip_x = chk_flip_x.checked == true
-        }
-
-        let p_flip_y = create_and_append_element('p',this.div_settings)
-        p_flip_y.textContent = "Flip vertically"
-
-        let chk_flip_y = create_and_append_element('input',p_flip_y)
-        chk_flip_y.type = "checkbox"
-        chk_flip_y.checked = this.data.default_props.flip_y
-        chk_flip_y.onchange = (e)=>{
-            this.data.default_props.flip_y = chk_flip_y.checked == true
-        }
-
-        {
-            let p_anchor_x = create_and_append_element('p',this.div_settings)
-            p_anchor_x.textContent = "Anchor X"
-
-            let inp_anchor_x = create_and_append_element('input',p_anchor_x)
-            inp_anchor_x.type = "number"
-            inp_anchor_x.value = this.data.default_props.anchor_x
-            inp_anchor_x.onchange = (e)=>{
-                this.data.default_props.anchor_x = parseInt(inp_anchor_x.value)
-            }
-        }
-        {
-            let p_anchor_y = create_and_append_element('p',this.div_settings)
-            p_anchor_y.textContent = "Anchor Y"
-
-            let inp_anchor_y = create_and_append_element('input',p_anchor_y)
-            inp_anchor_y.type = "number"
-            inp_anchor_y.value = this.data.default_props.anchor_y
-            inp_anchor_y.onchange = (e)=>{
-                this.data.default_props.anchor_y = parseInt(inp_anchor_y.value)
-            }
-        }
-
-        
 
         //Per frame settings
         this.div_frame_settings = create_and_append_element('div',this.div_settings)

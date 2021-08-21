@@ -16,6 +16,12 @@ class FrameEditorModal extends Modal {
         this.element.style.width = "100%"
         this.element.style.height = "100%"
 
+        this.btn_cancel.textContent = "Close"
+
+        this.h3_title = create_and_append_element('h3', this.element)
+        this.h3_title.classList.add('center')
+        this.h3_title.textContent = "???"
+
         //Canvas
         let div_center_canvas = create_and_append_element('div', this.element)
         div_center_canvas.classList.add('center')
@@ -30,10 +36,67 @@ class FrameEditorModal extends Modal {
         option_anchor.textContent = "anchor"
         option_anchor.value = "anchor"
 
-        this.canvas.addEventListener('mousemove',(e)=>{
+        this.button_import_selected = create_and_append_element('button', this.element)
+        this.button_import_selected.textContent = "Import Selected"
+        this.button_import_selected.onclick = ()=>{
+            this.ImportSelected()
+        }
+
+
+        this.canvas.addEventListener('mousedown',(e)=>{
             this.MouseDown(e)
         })
 
+    }
+    ImportSelected(){
+        let frames = this.GetSelectedFrames()
+        for(let frame of frames){
+            if(!frame.anchor_pos){
+                window.alert(`One or more selected frames have no anchor point selected`)
+                return
+            }
+        }
+        for(let frame of frames){
+            let animation_state = project_memory_manager.selected_animation_state_object
+            animation_state.AddFrame(frame)
+        }
+        let highest_index = this.RemoveSelectedFrames()
+        if(this.frames.length == 0){
+            this.CloseModal()
+            return
+        }else if(this.frames.length == 1){
+            this.selected_frame_indexes[0] = true
+        }else{
+            if(this.frames[highest_index]){
+                this.selected_frame_indexes[highest_index] = true
+            }
+        }
+    }
+    GetSelectedFrames(){
+        let selected_frames = []
+        for(let frame_index in this.selected_frame_indexes){
+            selected_frames.push(this.frames[parseInt(frame_index)])
+        }
+        return selected_frames
+    }
+    RemoveSelectedFrames(){
+        //remove selected frames and return the highest index removed
+        let frames = this.GetSelectedFrames()
+        let highest_index = 0
+        for(let frame_data of frames){
+            let frame_index = this.frames.indexOf(frame_data)
+            if(frame_index > highest_index){
+                highest_index = frame_index
+            }
+            this.frames.splice(frame_index,1)
+            if(frame_index < highest_index){
+                highest_index--
+            }
+        }
+        for(let index in this.selected_frame_indexes){
+            delete this.selected_frame_indexes[index]
+        }
+        return Math.max(0,highest_index)
     }
     MouseDown(e){
         let canvas_scale_x = this.canvas.offsetWidth/this.canvas.width
@@ -63,26 +126,27 @@ class FrameEditorModal extends Modal {
     }
     DrawFrame() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-        let selected_frame_count = Object.keys(this.selected_frame_indexes).length
-        for (let frame_index in this.selected_frame_indexes) {
-            let frame = this.frames[frame_index]
+        let frames = this.GetSelectedFrames()
+        for (let frame of frames) {
             draw_frame_data(frame, this.ctx, 0, 0)
             this.DrawAnchorForFrame(frame)
         }
     }
     DrawAnchorForFrame(frame){
-        let {minX,minY} = frame.source_bounds
-        let {x,y} = frame.anchor_pos
-        let local_x = x-minX
-        let local_y = y-minY
-        console.log('local',local_x,local_y)
-        this.ctx.fillStyle = 'rgba(255,0,0,0.5)'
-        this.ctx.fillRect(local_x-3,local_y,7,1)
-        this.ctx.fillRect(local_x,local_y-3,1,7)
+        if(frame.anchor_pos){
+            let {minX,minY} = frame.source_bounds
+            let {x,y} = frame.anchor_pos
+            let local_x = x-minX
+            let local_y = y-minY
+            console.log('local',local_x,local_y)
+            this.ctx.fillStyle = 'rgba(255,0,0,0.5)'
+            this.ctx.fillRect(local_x-3,local_y,7,1)
+            this.ctx.fillRect(local_x,local_y-3,1,7)
+        }
     }
     ResetData() {
         this.frames = null
-        this.selected_frame_indexes = {}
+        this.selected_frame_indexes = {0:true}
         if (this.frame_select) {
             this.element.removeChild(this.frame_select.element)
             delete this.frame_select
@@ -98,6 +162,8 @@ class FrameEditorModal extends Modal {
         console.log('importing frames', this.frames)
         this.frame_select = new FrameSelect({ id: 1, selected_frame_indexes: this.selected_frame_indexes, frames: this.frames })
         this.element.appendChild(this.frame_select.element)
+        this.button_import_selected.style.display = "inline"
+        this.h3_title.textContent = `Importing frames to Animation State ${project_memory_manager.selected_animation_state_object.data.state_name}`
         this.OpenModal()
     }
     EditFrames(frames_to_edit) {
@@ -106,6 +172,8 @@ class FrameEditorModal extends Modal {
         console.log('editing frames', this.frames)
         this.frame_select = new FrameSelect({ id: 1, selected_frame_indexes: this.selected_frame_indexes, frames: this.frames })
         this.element.appendChild(this.frame_select.element)
+        this.button_import_selected.style.display = "none"
+        this.h3_title.textContent = `Editing frames in Animation State ${project_memory_manager.selected_animation_state_object.data.state_name}`
         this.OpenModal()
     }
 }
