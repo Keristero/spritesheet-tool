@@ -18,6 +18,9 @@ class AnimationState extends CanvasContainer{
         if(!this.data.frames){
             this.data.frames = []
         }
+        if(!this.data.clone_states){
+            this.data.clone_states = []
+        }
         this.AddControlsPane()
         this.selected = false
         this.selected_frame_indexes = []
@@ -106,7 +109,18 @@ class AnimationState extends CanvasContainer{
         let x = this.preview.centerX - (current_frame_data.anchor_pos.x-current_frame_data.source_bounds.minX)
         let y = this.preview.centerY - (current_frame_data.anchor_pos.y-current_frame_data.source_bounds.minY)
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
+        this.ctx.save();
+        //If the whole animation is flipped, flip
+        if(this.data.flip_x){
+            this.ctx.translate(this.canvas.width, 0);
+            this.ctx.scale(-1, 1);
+        }
+        if(this.data.flip_y){
+            this.ctx.translate(0, this.canvas.height);
+            this.ctx.scale(1, -1);
+        }
         draw_frame_data(current_frame_data,this.ctx,x,y)
+        this.ctx.restore();
 
         this.preview.needs_redraw = false
         this.preview.next_frame_timeout = setTimeout(()=>{
@@ -119,12 +133,55 @@ class AnimationState extends CanvasContainer{
         },current_frame_data.duration)
         return true
     }
+    AddFlippedState(){
+        let clone_state = {
+            state_name:"",
+            flip_x:false,
+            flip_y:false
+        }
+        this.ShowFlippedState(clone_state)
+        this.data.clone_states.push(clone_state)
+    }
+    ShowFlippedState(clone_state){
+        let div_clone_state = create_and_append_element('div',this.div_clone_states)
+        let p_state_name = create_and_append_element('p',div_clone_state)
+        p_state_name.textContent = "Clone Name"
+        let inp_state_name = create_and_append_element('input',p_state_name)
+        inp_state_name.type = "text"
+        inp_state_name.value = clone_state.state_name
+        inp_state_name.onchange = (e)=>{
+            clone_state.state_name = `${inp_state_name.value}`.toUpperCase()
+            console.log(clone_state.state_name)
+        }
+        let chk_flip_x = create_and_append_checkbox_with_label('Flip X',div_clone_state)
+        chk_flip_x.checked = clone_state.flip_x
+        chk_flip_x.onchange = (e)=>{
+            clone_state.flip_x = chk_flip_x.checked
+            console.log(clone_state.flip_x)
+        }
+        let chk_flip_y = create_and_append_checkbox_with_label('Flip Y',div_clone_state)
+        chk_flip_y.checked = clone_state.flip_y
+        chk_flip_y.onchange = (e)=>{
+            clone_state.flip_y = chk_flip_y.checked
+            console.log(clone_state.flip_y)
+        }
+        let btn_delete_state = create_and_append_element('button',div_clone_state)
+        btn_delete_state.textContent = "Remove Clone State"
+        btn_delete_state.onclick = ()=>{
+            this.div_clone_states.removeChild(div_clone_state)
+            this.data.clone_states.splice(this.data.clone_states.indexOf(clone_state),1)
+        }
+    }
     AddControlsPane(){
         this.div_settings = create_and_append_element('div',this.contents)
 
         let btn_delete_sheet = create_and_append_element('button',this.div_settings)
         btn_delete_sheet.textContent = "Remove Animation State"
         btn_delete_sheet.onclick = ()=>{this.DeleteSelf()}
+
+        let btn_add_flipped = create_and_append_element('button',this.div_settings)
+        btn_add_flipped.textContent = "Add Clone State"
+        btn_add_flipped.onclick = ()=>{this.AddFlippedState()}
 
         let p_state_name = create_and_append_element('p',this.div_settings)
         p_state_name.textContent = "State Name"
@@ -136,6 +193,12 @@ class AnimationState extends CanvasContainer{
             this.data.state_name = `${inp_state_name.value}`.toUpperCase()
             console.log(this.data.state_name)
             this.UpdateTabTitle(this.data.state_name)
+        }
+
+        this.div_clone_states = create_and_append_element('div',this.div_settings)
+
+        for(let flipped_state of this.data.clone_states){
+            this.ShowFlippedState(flipped_state)
         }
 
         //Per frame settings

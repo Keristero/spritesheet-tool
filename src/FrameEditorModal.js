@@ -47,6 +47,14 @@ class FrameEditorModal extends Modal {
             this.MouseDown(e)
         })
 
+        document.addEventListener('keydown',(e)=>{
+            if(this.is_open){
+                if(e.code == "Enter"){
+                    this.ImportSelected()
+                }
+            }
+        })
+
     }
     ImportSelected(){
         let frames = this.GetSelectedFrames()
@@ -104,7 +112,6 @@ class FrameEditorModal extends Modal {
         //console.log(canvas_scale_x,canvas_scale_y)
         let x = Math.floor(e.offsetX/canvas_scale_x)
         let y = Math.floor(e.offsetY/canvas_scale_y)
-        console.log('mouse',x,y)
         for (let frame_index in this.selected_frame_indexes) {
             let frame = this.frames[frame_index]
             frame.anchor_pos = {x:x+frame.source_bounds.minX,y:y+frame.source_bounds.minY}

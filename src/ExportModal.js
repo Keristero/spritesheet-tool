@@ -93,6 +93,7 @@ class ExportModal extends Modal {
                 let state_object = animation_state_objects[state_id]
                 output_data[state_id] = {
                     state_name: state_object.data.state_name,
+                    clone_states: state_object.data.clone_states,
                     frames: []
                 }
 
@@ -139,22 +140,38 @@ function output_data_to_animation_format(output_data){
     let output_txt = ""
     for(let animation_state_id in output_data){
         let animation_state = output_data[animation_state_id]
-        output_txt += `animation state="${animation_state.state_name}"\n`
-        
-        for(let frame of animation_state.frames){
-            let {duration,x,y,width,height,anchor_x,anchor_y,flip_x,flip_y} = frame
-            output_txt += `frame duration="${duration/1000}" x="${x}" y="${y}" w="${width}" h="${height}" originx="${anchor_x}" originy="${anchor_y}"`
-            if(flip_x){
-                output_txt += ` flipx="1"`
-            }
-            if(flip_y){
-                output_txt += ` flipy="1"`
-            }
-            output_txt += `\n`
+        console.log(animation_state)
+
+        let copies = [{state_name:animation_state.state_name,flip_x:false,flip_y:false}]
+
+        for(let clone_state of animation_state.clone_states){
+            copies.push(clone_state)
         }
 
-        //Line break between each animation
-        output_txt += `\n`
+        for(let copy of copies){
+            let {state_name,flip_x,flip_y} = copy
+
+            output_txt += `animation state="${state_name}"\n`
+
+            for(let frame of animation_state.frames){
+                let {duration,x,y,width,height,anchor_x,anchor_y} = frame
+
+                out_flipped_x = frame.flip_x ? !flip_x : flip_x
+                out_flipped_y = frame.flip_y ? !flip_y : flip_y
+
+                output_txt += `frame duration="${duration/1000}" x="${x}" y="${y}" w="${width}" h="${height}" originx="${anchor_x}" originy="${anchor_y}"`
+                if(out_flipped_x){
+                    output_txt += ` flipx="1"`
+                }
+                if(out_flipped_y){
+                    output_txt += ` flipy="1"`
+                }
+                output_txt += `\n`
+            }
+
+            //Line break between each animation
+            output_txt += `\n`
+        }
     }
     return output_txt
 }

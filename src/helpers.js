@@ -4,6 +4,14 @@ function create_and_append_element(element_tag,parent){
     return new_element
 }
 
+function create_and_append_checkbox_with_label(label_text,parent){
+    let chk_box = create_and_append_element('input',parent)
+    chk_box.type = "checkbox"
+    let label_box = create_and_append_element('label',parent)
+    label_box.textContent = label_text
+    return chk_box
+}
+
 function download_json_file(filename,text){
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/text;charset=utf-8,' + text );
