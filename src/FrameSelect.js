@@ -57,8 +57,13 @@ class FrameSelect extends CanvasContainer{
         for(let frame_index of selected_frames){
             this.AddFrameToSelection(frame_index)
         }
+        this.SelectionChanged()
         console.log("selected frames",selected_frames)
         this.ClearSelectionBox()
+    }
+    SelectionChanged(){
+        const event = new CustomEvent('selectionchanged', {selected_frames:this.selected_frames});
+        this.element.dispatchEvent(event);
     }
     StartSelectionBox(){
         super.StartSelectionBox()
@@ -80,7 +85,7 @@ class FrameSelect extends CanvasContainer{
         for(let frame_index of selected_frames){
             this.AddFrameToSelection(frame_index)
         }
-        console.log("selected frames",selected_frames)
+        this.SelectionChanged()
         this.ClearSelectionBox()
     }
     DrawFrames(){

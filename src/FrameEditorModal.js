@@ -3,6 +3,7 @@ class FrameEditorModal extends Modal {
         super()
         this.selected_frame_indexes = {}
         this.frames = []
+        this.mode = null
         this.PrepareHTML()
     }
     DrawIfRequired() {
@@ -36,6 +37,15 @@ class FrameEditorModal extends Modal {
         option_anchor.textContent = "anchor"
         option_anchor.value = "anchor"
 
+        this.div_frame_properties = create_and_append_element('div', this.element)
+        this.input_duration = create_and_append_element('input', this.div_frame_properties)
+        this.input_duration.type = 'number'
+        this.input_duration.oninput = ()=>{
+            this.UpdatePropertyOfSelectedFrames('duration',this.input_duration.value)
+        }
+        this.label_duration = create_and_append_element('label', this.div_frame_properties)
+        this.label_duration.textContent = "duration (milliseconds)"
+
         this.button_import_selected = create_and_append_element('button', this.element)
         this.button_import_selected.textContent = "Import Selected"
         this.button_import_selected.onclick = ()=>{
@@ -50,7 +60,9 @@ class FrameEditorModal extends Modal {
         document.addEventListener('keydown',(e)=>{
             if(this.is_open){
                 if(e.code == "Enter"){
-                    this.ImportSelected()
+                    if(this.mode == "import"){
+                        this.ImportSelected()
+                    }
                 }
             }
         })
@@ -155,6 +167,7 @@ class FrameEditorModal extends Modal {
         this.frames = null
         this.selected_frame_indexes = {0:true}
         if (this.frame_select) {
+            this.frame_select.element.removeEventListener('selectionchanged',this.on_select_changed)
             this.element.removeChild(this.frame_select.element)
             delete this.frame_select
         }
@@ -162,10 +175,32 @@ class FrameEditorModal extends Modal {
     OpenModal() {
         this.RescaleCanvasToScreen()
         super.OpenModal()
+        this.on_select_changed = ()=>{
+            this.RefreshFrameProperties()
+        }
+        this.RefreshFrameProperties()
+        this.frame_select.element.addEventListener('selectionchanged',this.on_select_changed)
+    }
+    UpdatePropertyOfSelectedFrames(key,value){
+        let selected_frames = this.GetSelectedFrames()
+        for(let frame of selected_frames){
+            frame[key] = value
+        }
+        this.RefreshFrameProperties()
+    }
+    RefreshFrameProperties(){
+        console.log("gottem",this.selected_frame_indexes)
+        let selected_frames = this.GetSelectedFrames()
+        if(selected_frames.length > 0){
+            let first_frame = selected_frames[0]
+            console.log(first_frame)
+            this.input_duration.value = first_frame.duration
+        }
     }
     ImportFrames(frames_to_import) {
         this.ResetData()
         this.frames = frames_to_import
+        this.mode = "import"
         console.log('importing frames', this.frames)
         this.frame_select = new FrameSelect({ id: 1, selected_frame_indexes: this.selected_frame_indexes, frames: this.frames })
         this.element.appendChild(this.frame_select.element)
@@ -176,6 +211,7 @@ class FrameEditorModal extends Modal {
     EditFrames(frames_to_edit) {
         this.ResetData()
         this.frames = frames_to_edit
+        this.mode = "edit"
         console.log('editing frames', this.frames)
         this.frame_select = new FrameSelect({ id: 1, selected_frame_indexes: this.selected_frame_indexes, frames: this.frames })
         this.element.appendChild(this.frame_select.element)
