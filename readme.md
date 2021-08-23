@@ -71,7 +71,7 @@ copy paste images into the web page
 1. Add a clone animation state button which prompts you for a new name, and if you want to flip the X or Y ✅
     1. cant be edited, its a flipped clone of another state ✅
 1. Dont copy trasparent color pixels into imported frames
-1. ensure pixels are not being cut off on the far right and bottom of selection
+1. ensure pixels are not being cut off on the far right and bottom of selection ✅
 1. add button to automatically import all frames from a sheet to the current animation state
 1. add button to automatically import all frames from ALL sheets
 1. make it pretty

@@ -130,7 +130,7 @@ class InputSheet extends CanvasContainer{
         }
     }
     AddSelectedBounds(new_bounds){
-        if(new_bounds.minX == new_bounds.maxX || new_bounds.minY == new_bounds.maxY){
+        if(new_bounds.minX >= new_bounds.maxX-1 || new_bounds.minY >= new_bounds.maxY-1){
             return
         }
         if(!this.BoundsAreAlreadySelected(new_bounds)){
@@ -276,7 +276,7 @@ function find_transparent_bounding_box(image_data,startX,startY,image_width,imag
             add_tile_to_stack(x,y-1,d+1)
         }
     }
-    let new_box = {minX,minY,maxX,maxY}
+    let new_box = {minX,minY,maxX:maxX+1,maxY:maxY+1}
     return {new_box,latest_history}
 }
 
