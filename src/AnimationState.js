@@ -23,7 +23,7 @@ class AnimationState extends CanvasContainer{
         }
         this.AddControlsPane()
         this.selected = false
-        this.selected_frame_indexes = []
+        this.selected_frame_indexes = {}
         this.frame_select = new FrameSelect({id:0,selected_frame_indexes:this.selected_frame_indexes,frames:this.data.frames})
         this.div_settings.insertBefore(this.frame_select.element,this.div_frame_settings)
         this.ResetAnimation()
@@ -47,7 +47,9 @@ class AnimationState extends CanvasContainer{
         this.frame_select.RecomputeCanvasSize()
     }
     ClearFrameSelection(){
-        this.selected_frame_indexes = {}
+        for(let selected_frame_id in this.selected_frame_indexes){
+            delete this.selected_frame_indexes[selected_frame_id]
+        }
     }
     DeleteSelectedFrames(){
         let frames = this.GetSelectedFrames()
