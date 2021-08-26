@@ -19,6 +19,8 @@ class InputSheet extends CanvasContainer{
         this.ctx.imageSmoothingEnabled = false
         this.FillImage()
         this.image_loaded = true
+        console.log('loaded image with transparency=',this.transparent_color)
+        this.DisplayTransparentColor()
     }
     AddControlsPane(){
 
@@ -61,7 +63,6 @@ class InputSheet extends CanvasContainer{
         p_transparent_color.textContent = "Transparency Color (set with scroll click)"
 
         this.div_transparent_color = create_and_append_element('div',p_transparent_color)
-        this.DisplayTransparentColor()
 
         let btn_delete_sheet = create_and_append_element('button',this.div_settings)
         btn_delete_sheet.textContent = "Remove Input Sheet"
@@ -94,13 +95,22 @@ class InputSheet extends CanvasContainer{
         this.AddSelectedBounds(new_bounds)
         this.done_redraw = false
     }
+    MouseDown(e){
+        super.MouseDown(e)
+        if(e.button == 1){
+            //middle click
+            let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
+            let pixel_color = getPixel(image_data,this.hover_pos.x,this.hover_pos.y)
+            this.transparent_color = pixel_color
+        }
+    }
     FillImage(){
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
         this.ctx.drawImage(this.image,0,0)
     }
     DisplayTransparentColor(){
-        this.div_transparent_color.style.backgroundColor = `rgba(${this.data.transparent_color})`
-        this.div_transparent_color.textContent = this.data.transparent_color
+        this.div_transparent_color.style.backgroundColor = `rgba(${this.transparent_color})`
+        this.div_transparent_color.textContent = this.transparent_color
     }
     get transparent_color(){
         if(this.data.transparent_color){
@@ -109,6 +119,7 @@ class InputSheet extends CanvasContainer{
             if(this.image_loaded){
                 let image_data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
                 let pixel_color = getPixel(image_data,0,0)
+                return pixel_color
             }else{
                 return [0,0,0,0]
             }
