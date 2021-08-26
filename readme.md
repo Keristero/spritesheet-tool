@@ -3,10 +3,10 @@ copy paste images into the web page
 ## Usage
 1. copy paste spritesheets / sprites onto the web page
 1. add your first *animation state*
-1. press the left mouse button to begin selecting a frame
-    1. if selection does not detect your frame correctly, try adjusting the selection radius and transparent pixel color
-1. release the left mouse button to set your anchor position
-1. after you have made a selection, left click the frame again to add it to whatever animation state you have selected
+1. select the frames you want to add to your animation then click import
+1. for each frame, set the anchor point - then click add frame (or press enter)
+1. when you are done setting up animations, save your project
+1. export the spritesheet and .animation file by clicking export then copying the output.
 ## todo
 ### V1
 1. allow selection of transparent color, default it to the top left pixel ✅
