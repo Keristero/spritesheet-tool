@@ -265,11 +265,13 @@ function find_transparent_bounding_box(image_data,startX,startY,image_width,imag
         let {x,y,d} = stack.shift()
         //add adjacent tiles to stack if tile is not transparent
         let pixel = getPixel(image_data,x,y)
-        if (!(pixel[0] == t[0] && pixel[1] == t[1] && pixel[2] == t[2] && pixel[3] == t[3])){
-            add_tile_to_stack(x+1,y,0)
-            add_tile_to_stack(x-1,y,0)
-            add_tile_to_stack(x,y+1,0)
-            add_tile_to_stack(x,y-1,0)
+        if (!(pixel[0] === t[0] && pixel[1] === t[1] && pixel[2] === t[2] && pixel[3] === t[3])){
+            if(pixel[0] !== undefined){
+                add_tile_to_stack(x+1,y,0)
+                add_tile_to_stack(x-1,y,0)
+                add_tile_to_stack(x,y+1,0)
+                add_tile_to_stack(x,y-1,0)
+            }
             if(x > maxX){
                 maxX = x
             }else if(x < minX){
