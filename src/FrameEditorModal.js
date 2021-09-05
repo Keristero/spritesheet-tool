@@ -46,6 +46,17 @@ class FrameEditorModal extends Modal {
         this.label_duration = create_and_append_element('label', this.div_frame_properties)
         this.label_duration.textContent = "duration (milliseconds)"
 
+        this.chk_flip_x = create_and_append_checkbox_with_label('Flip X',this.div_frame_properties)
+        //chk_flip_x.checked = clone_state.flip_x
+        this.chk_flip_x.onchange = (e)=>{
+            this.UpdatePropertyOfSelectedFrames('flip_x',this.chk_flip_x.checked)
+        }
+        this.chk_flip_y = create_and_append_checkbox_with_label('Flip Y',this.div_frame_properties)
+        //chk_flip_y.checked = clone_state.flip_y
+        this.chk_flip_y.onchange = (e)=>{
+            this.UpdatePropertyOfSelectedFrames('flip_y',this.chk_flip_y.checked)
+        }
+
         this.button_import_selected = create_and_append_element('button', this.element)
         this.button_import_selected.textContent = "Import Selected"
         this.button_import_selected.onclick = ()=>{
@@ -195,6 +206,8 @@ class FrameEditorModal extends Modal {
             let first_frame = selected_frames[0]
             console.log(first_frame)
             this.input_duration.value = first_frame.duration
+            this.chk_flip_x.checked = first_frame.flip_x
+            this.chk_flip_y.checked = first_frame.flip_y
         }
     }
     ImportFrames(frames_to_import) {
