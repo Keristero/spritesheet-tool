@@ -1,5 +1,16 @@
 copy paste images into the web page
 
+## Installation
+1. clone this repository or download it as a zip
+
+Method 1 (run locally):
+1. open index.html with your browser
+
+Method 2 (host webserver)
+1. install nodejs
+1. run `npm install` in root
+1. run `node run-server.js`
+
 ## Usage
 1. copy paste spritesheets / sprites onto the web page
 1. add your first *animation state*
@@ -7,6 +18,7 @@ copy paste images into the web page
 1. for each frame, set the anchor point - then click add frame (or press enter)
 1. when you are done setting up animations, save your project
 1. export the spritesheet and .animation file by clicking export then copying the output.
+
 ## todo
 ### V1
 1. allow selection of transparent color, default it to the top left pixel ✅
