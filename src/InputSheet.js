@@ -41,20 +41,7 @@ class InputSheet extends CanvasContainer{
                 window.alert("No animation state selected")
                 return
             }
-            console.log(project_memory_manager.memory.selected_animation_state_id)
-            let new_frames = []
-            for(let bounds of this.selected_bounds){
-                let new_frame_data = {
-                    sheet_id:this.id,
-                    source_bounds:bounds,
-                    anchor_pos:null,
-                    duration:100,
-                    flip_x:false,
-                    flip_y:false
-                }
-                new_frames.push(new_frame_data)
-            }
-            frame_editor_modal.ImportFrames(new_frames)
+            this.ImportSelected()
         }
 
         this.div_settings = create_and_append_element('div',this.contents)
@@ -67,6 +54,26 @@ class InputSheet extends CanvasContainer{
         let btn_delete_sheet = create_and_append_element('button',this.div_settings)
         btn_delete_sheet.textContent = "Remove Input Sheet"
         btn_delete_sheet.onclick = ()=>{this.DeleteSelf()}
+    }
+    GetSelectedFrames(){
+        console.log(project_memory_manager.memory.selected_animation_state_id)
+        let new_frames = []
+        for(let bounds of this.selected_bounds){
+            let new_frame_data = {
+                sheet_id:this.id,
+                source_bounds:bounds,
+                anchor_pos:null,
+                duration:100,
+                flip_x:false,
+                flip_y:false
+            }
+            new_frames.push(new_frame_data)
+        }
+        return new_frames
+    }
+    ImportSelected(){
+        let new_frames = this.GetSelectedFrames()
+        frame_editor_modal.ImportFrames(new_frames)
     }
     CombineSelection(){
         let new_bounds={

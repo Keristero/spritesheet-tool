@@ -5,11 +5,46 @@ if (navigator.clipboard) {
 }
 
 const btn_add_state = document.getElementById("btn_add_state");
+const btn_select_all = document.getElementById("btn_select_all");
+const btn_import_all = document.getElementById("btn_import_all");
 const keyboard = new Keyboard()
 
 btn_add_state.onclick = () => {
     project_memory_manager.NewAnimationState()
 };
+
+btn_select_all.onclick = () => {
+    for(let input_sheet_id in project_memory_manager.input_sheet_objects){
+        let input_sheet = project_memory_manager.input_sheet_objects[input_sheet_id]
+        console.log(input_sheet)
+        input_sheet.drag_selection_start = {x:1,y:1}
+        input_sheet.drag_selection_end = {x:input_sheet.canvas.width-1,y:input_sheet.canvas.height-1}
+        console.log(input_sheet.drag_selection_start.x,input_sheet.drag_selection_end.x)
+        input_sheet.ClearSelectedBounds()
+        input_sheet.FindBoundingBoxs()
+        input_sheet.ClearSelectionBox()
+        input_sheet.done_redraw = false
+    }
+};
+
+btn_import_all.onclick = () => {
+    let all_frames = []
+    for(let input_sheet_id in project_memory_manager.input_sheet_objects){
+        let input_sheet = project_memory_manager.input_sheet_objects[input_sheet_id]
+        let new_frames = input_sheet.GetSelectedFrames()
+        all_frames = all_frames.concat(new_frames)
+    }
+    if(all_frames.length === 0){
+        window.alert("No frames selected")
+        return
+    }
+    if(project_memory_manager.memory.selected_animation_state_id == null){
+        window.alert("No animation state selected")
+        return
+    }
+    frame_editor_modal.ImportFrames(all_frames)
+};
+
 
 window.addEventListener("paste", async (clipboard_event) => {
     let clipboard_images = GetImagesFromClipboard(clipboard_event);

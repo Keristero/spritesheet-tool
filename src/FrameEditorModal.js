@@ -37,6 +37,19 @@ class FrameEditorModal extends Modal {
         option_anchor.textContent = "anchor"
         option_anchor.value = "anchor"
 
+        this.quick_point_select = new QuickPointSelect((x,y)=>{
+            let frames = this.GetSelectedFrames()
+            for(let frame of frames){
+                let {minX,minY,maxX,maxY} = frame.source_bounds
+                let width = (maxX-minX)-1
+                let height = (maxY-minY)-1
+                frame.anchor_pos = {x:Math.round(minX+(width*x)),y:Math.round(minY+(height*y))}
+                console.log(frame.anchor_pos)
+            }
+        })
+        this.quick_point_select.ToggleCollapse()
+        this.element.appendChild(this.quick_point_select.element)
+
         this.div_frame_properties = create_and_append_element('div', this.element)
         this.input_duration = create_and_append_element('input', this.div_frame_properties)
         this.input_duration.type = 'number'
