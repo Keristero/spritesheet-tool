@@ -139,7 +139,8 @@ class AnimationState extends CanvasContainer{
         let clone_state = {
             state_name:"",
             flip_x:false,
-            flip_y:false
+            flip_y:false,
+            speed_multi:1
         }
         this.ShowFlippedState(clone_state)
         this.data.clone_states.push(clone_state)
@@ -167,6 +168,15 @@ class AnimationState extends CanvasContainer{
             clone_state.flip_y = chk_flip_y.checked
             console.log(clone_state.flip_y)
         }
+        let inp_speed_multi = create_and_append_element('input',div_clone_state)
+        inp_speed_multi.type = 'number'
+        inp_speed_multi.value = clone_state.speed_multi
+        inp_speed_multi.onchange = (e)=>{
+            clone_state.speed_multi = parseFloat(inp_speed_multi.value)
+        }
+        let inp_speed_multi_label = create_and_append_element('label',div_clone_state)
+        inp_speed_multi_label.textContent = " Speed Multiplier"
+
         let btn_delete_state = create_and_append_element('button',div_clone_state)
         btn_delete_state.textContent = "Remove Clone State"
         btn_delete_state.onclick = ()=>{

@@ -224,14 +224,14 @@ function output_data_to_animation_format(output_data){
         let animation_state = output_data[animation_state_id]
         console.log(animation_state)
 
-        let copies = [{state_name:animation_state.state_name,flip_x:false,flip_y:false}]
+        let copies = [{state_name:animation_state.state_name,flip_x:false,flip_y:false,speed_multi:1}]
 
         for(let clone_state of animation_state.clone_states){
             copies.push(clone_state)
         }
 
         for(let copy of copies){
-            let {state_name,flip_x,flip_y} = copy
+            let {state_name,flip_x,flip_y,speed_multi} = copy
 
             output_txt += `animation state="${state_name}"\n`
 
@@ -241,7 +241,11 @@ function output_data_to_animation_format(output_data){
                 out_flipped_x = frame.flip_x ? !flip_x : flip_x
                 out_flipped_y = frame.flip_y ? !flip_y : flip_y
 
-                output_txt += `frame duration="${duration/1000}" x="${x}" y="${y}" w="${width}" h="${height}" originx="${anchor_x}" originy="${anchor_y}"`
+                let frame_duration = round_to_decimal_points(duration/(1000*speed_multi),3)
+
+                
+
+                output_txt += `frame duration="${frame_duration}" x="${x}" y="${y}" w="${width}" h="${height}" originx="${anchor_x}" originy="${anchor_y}"`
                 if(out_flipped_x){
                     output_txt += ` flipx="1"`
                 }

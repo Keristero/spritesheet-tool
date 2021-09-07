@@ -38,6 +38,10 @@ function LoadImage(src) {
     });
 }
 
+function round_to_decimal_points(num,x) {
+    return +(Math.round(num + `e+${x}`)  + `e-${x}`);
+}
+
 function rect_overlap(region1,region2){
     if (region1.minX < region2.maxX &&
         region1.maxX > region2.minX &&
