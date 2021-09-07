@@ -60,18 +60,22 @@ function draw_frame_data(frame_data,target_ctx,x,y,t_width,t_height){
     let target_width = t_width ?? width
     let target_height = t_height ?? height
     let source_sheet_object = project_memory_manager.GetInputSheetById(sheet_id)
-    let source_canvas = source_sheet_object.canvas
+    let source_canvas = source_sheet_object.image_buffer_canvas
     target_ctx.drawImage(source_canvas,minX,minY,width,height,Math.floor(x),Math.floor(y),target_width,target_height)
-    let ctx_image_data = target_ctx.getImageData(Math.floor(x), Math.floor(y), target_width,target_height)
-    let modified_image_data = removeColor(ctx_image_data,source_sheet_object.transparent_color,target_ctx)
-    target_ctx.putImageData(modified_image_data, Math.floor(x), Math.floor(y));
+    //let ctx_image_data = target_ctx.getImageData(Math.floor(x), Math.floor(y), target_width,target_height)
+    //let modified_image_data = removeColor(ctx_image_data,source_sheet_object.transparent_color,target_ctx)
+    //target_ctx.putImageData(modified_image_data, Math.floor(x), Math.floor(y));
 }
 
 function removeColor(ctx_image_data,color){
+    console.log('removed transparent color')
     let pix = ctx_image_data.data;
     for (var i = 0, n = pix.length; i <n; i += 4) {
         if(pix[i] === color[0] && pix[i+1] === color[1] && pix[i+2] === color[2] && pix[i+3] === color[3]){
             pix[i+3] = 0
+            pix[i+2] = 0
+            pix[i+1] = 0
+            pix[i] = 0
         }
     }
     return ctx_image_data

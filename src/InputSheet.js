@@ -6,6 +6,10 @@ class InputSheet extends CanvasContainer{
         this.image_loaded = false
         this.image_name = image_name
         this.selected_bounds = []
+        this.image_buffer_canvas = document.createElement('canvas')
+        this.image_buffer_canvas.style.display = "hidden"
+        this.image_buffer_ctx = this.image_buffer_canvas.getContext('2d')
+        this.image_buffer_ctx.imageSmoothingEnabled = false
         this.AddControlsPane()
         this.LoadImage(image_url)
         this.UpdateTabTitle(this.image_name)
@@ -21,6 +25,11 @@ class InputSheet extends CanvasContainer{
         this.image_loaded = true
         console.log('loaded image with transparency=',this.transparent_color)
         this.DisplayTransparentColor()
+    }
+    ResizeCanvas(width,height){
+        super.ResizeCanvas(width,height)
+        this.image_buffer_canvas.width = width
+        this.image_buffer_canvas.height = height
     }
     AddControlsPane(){
 
@@ -114,10 +123,16 @@ class InputSheet extends CanvasContainer{
     FillImage(){
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
         this.ctx.drawImage(this.image,0,0)
+        //Draw onto an invisible canvas and remove transparent pixels
+        console.log("Refilled image")
+        let ctx_image_data = this.ctx.getImageData(0, 0, this.canvas.width,this.canvas.height)
+        let modified_image_data = removeColor(ctx_image_data,this.transparent_color)
+        this.image_buffer_ctx.putImageData(modified_image_data, 0, 0);
     }
     DisplayTransparentColor(){
         this.div_transparent_color.style.backgroundColor = `rgba(${this.transparent_color})`
         this.div_transparent_color.textContent = this.transparent_color
+        this.FillImage()
     }
     get transparent_color(){
         if(this.data.transparent_color){
