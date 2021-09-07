@@ -1,7 +1,7 @@
 class ExportModal extends Modal {
     constructor() {
         super()
-        this.spacing = "even"
+        this.spacing = "compact"
         this.format = ".animation"
         this.PrepareHTML()
     }
