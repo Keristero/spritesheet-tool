@@ -88,7 +88,7 @@ Method 2 (host webserver)
 1. add button to automatically import all frames from ALL sheets ✅
 1. make it pretty
 ### V1.3
-1. export cramped images
+1. export cramped images ✅
 1. Undo everything with ctrl+z!
 ### ...
 ### V999.9

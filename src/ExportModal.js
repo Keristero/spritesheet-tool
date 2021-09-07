@@ -15,10 +15,10 @@ class ExportModal extends Modal {
         let option_compact = create_and_append_element('option', select_spacing)
         option_compact.value = "compact"
         option_compact.textContent = "Compact"
+        option_compact.selected = true
         let option_even = create_and_append_element('option', select_spacing)
         option_even.value = "even"
         option_even.textContent = "Even"
-        option_even.selected = true
         select_spacing.onchange = () => {
             this.spacing = select_spacing.value
             this.RenderOutput()
@@ -59,71 +59,12 @@ class ExportModal extends Modal {
     }
     RenderOutputSheet() {
         let animation_state_objects = project_memory_manager.animation_state_objects
-        let output_data = {}
-
+        let output_data = null
         if (this.spacing == "even") {
-            let max_frame_width = 0
-            let max_frame_height = 0
-            let max_frame_count = 0
-            let animation_state_count = 0
-
-            //Read frame information
-            for (let state_id in animation_state_objects) {
-                let state_data = animation_state_objects[state_id]
-                console.log(state_data)
-
-                let widest_in_state = state_data.GetWidestFrameWidthAnchored()
-                let tallest_in_state = state_data.GetTallestFrameHeightAnchored()
-                max_frame_width = Math.max(widest_in_state, max_frame_width)
-                max_frame_height = Math.max(tallest_in_state, max_frame_height)
-                if (state_data.data.frames.length > max_frame_count) {
-                    max_frame_count = state_data.data.frames.length
-                }
-                animation_state_count++
-            }
-
-            let half_max_width = max_frame_width / 2
-            let half_max_height = max_frame_height / 2
-            let x = 0
-            let y = 0
-            this.canvas.width = max_frame_width * max_frame_count
-            this.canvas.height = max_frame_height * animation_state_count
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-            for (let state_id in animation_state_objects) {
-                let state_object = animation_state_objects[state_id]
-                output_data[state_id] = {
-                    state_name: state_object.data.state_name,
-                    clone_states: state_object.data.clone_states,
-                    frames: []
-                }
-
-                for (let frame of state_object.data.frames) {
-                    let { minX, minY, maxX, maxY } = frame.source_bounds
-                    let width = maxX - minX
-                    let height = maxY - minY
-                    let anchor_x = (frame.anchor_pos.x - frame.source_bounds.minX)
-                    let anchor_y = (frame.anchor_pos.y - frame.source_bounds.minY)
-                    let anchored_x = half_max_width + (x - anchor_x)
-                    let anchored_y = half_max_height + (y - anchor_y)
-                    //Draw frames to canvas
-                    draw_frame_data(frame, this.ctx, anchored_x, anchored_y)
-                    output_data[state_id].frames.push({
-                        duration: frame.duration,
-                        x: anchored_x,
-                        y: anchored_y,
-                        width: width,
-                        height: height,
-                        anchor_x: anchor_x,
-                        anchor_y: anchor_y,
-                        flip_x: frame.flip_x,
-                        flip_y: frame.flip_y
-                    })
-                    x += max_frame_width
-                }
-                x = 0
-                y += max_frame_height
-            }
-            console.log('drew even spacing')
+            output_data = evenly_space(animation_state_objects,this.canvas,this.ctx)
+        }
+        if (this.spacing == "compact") {
+            output_data = compact_space(animation_state_objects,this.canvas,this.ctx)
         }
         return output_data
     }
@@ -134,6 +75,136 @@ class ExportModal extends Modal {
             this.pre_output_text.textContent = output_data_to_animation_format(output_data)
         }
     }
+}
+
+function compact_space(animation_state_objects,canvas,ctx){
+    let output_data = {}
+    let max_frame_width = 0
+    let max_frame_height = 0
+    let max_frame_count = 0
+    let animation_state_count = 0
+
+    //Read frame information
+    let boxes = []
+    for (let state_id in animation_state_objects) {
+        let state_data = animation_state_objects[state_id]
+        for(let frame of state_data.data.frames){
+            let {minX,minY,maxX,maxY} = frame.source_bounds
+            let width = maxX-minX
+            let height = maxY-minY
+            boxes.push({
+                state_id:state_id,
+                reference:frame,
+                w:width,
+                h:height
+            })
+        }
+    }
+
+    let result = potpack(boxes)
+    console.log('potpack',result)
+
+    let x = 0
+    let y = 0
+    canvas.width = result.w
+    canvas.height = result.h
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    for(let box of boxes){
+        let frame = box.reference
+        let state_id = box.state_id
+        draw_frame_data(frame, ctx, box.x, box.y)
+        if(!output_data[state_id]){
+            let state_object = animation_state_objects[state_id]
+            output_data[state_id] = {
+                state_name: state_object.data.state_name,
+                clone_states: state_object.data.clone_states,
+                frames: []
+            }
+        }
+        let anchor_x = (frame.anchor_pos.x - frame.source_bounds.minX)
+        let anchor_y = (frame.anchor_pos.y - frame.source_bounds.minY)
+        output_data[box.state_id].frames.push({
+            duration: frame.duration,
+            x: box.x,
+            y: box.y,
+            width: box.w,
+            height: box.h,
+            anchor_x: anchor_x,
+            anchor_y: anchor_y,
+            flip_x: frame.flip_x,
+            flip_y: frame.flip_y
+        })
+    }
+    console.log('drew compact spacing')
+    return output_data
+}
+
+function evenly_space(animation_state_objects,canvas,ctx){
+    let output_data = {}
+    let max_frame_width = 0
+    let max_frame_height = 0
+    let max_frame_count = 0
+    let animation_state_count = 0
+
+    //Read frame information
+    for (let state_id in animation_state_objects) {
+        let state_data = animation_state_objects[state_id]
+        console.log(state_data)
+
+        let widest_in_state = state_data.GetWidestFrameWidthAnchored()
+        let tallest_in_state = state_data.GetTallestFrameHeightAnchored()
+        max_frame_width = Math.max(widest_in_state, max_frame_width)
+        max_frame_height = Math.max(tallest_in_state, max_frame_height)
+        if (state_data.data.frames.length > max_frame_count) {
+            max_frame_count = state_data.data.frames.length
+        }
+        animation_state_count++
+    }
+
+    let half_max_width = max_frame_width / 2
+    let half_max_height = max_frame_height / 2
+    let x = 0
+    let y = 0
+    canvas.width = max_frame_width * max_frame_count
+    canvas.height = max_frame_height * animation_state_count
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    for (let state_id in animation_state_objects) {
+        let state_object = animation_state_objects[state_id]
+        output_data[state_id] = {
+            state_name: state_object.data.state_name,
+            clone_states: state_object.data.clone_states,
+            frames: []
+        }
+
+        for (let frame of state_object.data.frames) {
+            let { minX, minY, maxX, maxY } = frame.source_bounds
+            let width = maxX - minX
+            let height = maxY - minY
+            let anchor_x = (frame.anchor_pos.x - frame.source_bounds.minX)
+            let anchor_y = (frame.anchor_pos.y - frame.source_bounds.minY)
+            let anchored_x = half_max_width + (x - anchor_x)
+            let anchored_y = half_max_height + (y - anchor_y)
+            //Draw frames to canvas
+            draw_frame_data(frame, ctx, anchored_x, anchored_y)
+            output_data[state_id].frames.push({
+                duration: frame.duration,
+                x: anchored_x,
+                y: anchored_y,
+                width: width,
+                height: height,
+                anchor_x: anchor_x,
+                anchor_y: anchor_y,
+                flip_x: frame.flip_x,
+                flip_y: frame.flip_y
+            })
+            x += max_frame_width
+        }
+        x = 0
+        y += max_frame_height
+    }
+    console.log('drew even spacing')
+    return output_data
 }
 
 function output_data_to_animation_format(output_data){
