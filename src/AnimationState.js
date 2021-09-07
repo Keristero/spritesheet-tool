@@ -140,7 +140,8 @@ class AnimationState extends CanvasContainer{
             state_name:"",
             flip_x:false,
             flip_y:false,
-            speed_multi:1
+            speed_multi:1,
+            reverse:false
         }
         this.ShowFlippedState(clone_state)
         this.data.clone_states.push(clone_state)
@@ -167,6 +168,12 @@ class AnimationState extends CanvasContainer{
         chk_flip_y.onchange = (e)=>{
             clone_state.flip_y = chk_flip_y.checked
             console.log(clone_state.flip_y)
+        }
+        let chk_reverse = create_and_append_checkbox_with_label('Reverse Frame Order',div_clone_state)
+        chk_reverse.checked = clone_state.reverse
+        chk_reverse.onchange = (e)=>{
+            clone_state.reverse = chk_reverse.checked
+            console.log(clone_state.reverse)
         }
         let inp_speed_multi = create_and_append_element('input',div_clone_state)
         inp_speed_multi.type = 'number'

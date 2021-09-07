@@ -231,10 +231,14 @@ function output_data_to_animation_format(output_data){
         }
 
         for(let copy of copies){
-            let {state_name,flip_x,flip_y,speed_multi} = copy
+            let {state_name,flip_x,flip_y,speed_multi,reverse} = copy
 
             output_txt += `animation state="${state_name}"\n`
 
+            if(reverse){
+                //Reverse the array if it should be reversed
+                animation_state.frames.reverse()
+            }
             for(let frame of animation_state.frames){
                 let {duration,x,y,width,height,anchor_x,anchor_y} = frame
 
@@ -253,6 +257,10 @@ function output_data_to_animation_format(output_data){
                     output_txt += ` flipy="1"`
                 }
                 output_txt += `\n`
+            }
+            if(reverse){
+                //Reverse the array again when we are done to put it back in the correct order
+                animation_state.frames.reverse()
             }
 
             //Line break between each animation
