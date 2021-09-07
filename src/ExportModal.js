@@ -66,6 +66,12 @@ class ExportModal extends Modal {
         if (this.spacing == "compact") {
             output_data = compact_space(animation_state_objects,this.canvas,this.ctx)
         }
+        for(let animation_state_id in output_data){
+            let animation_state = output_data[animation_state_id]
+            animation_state.frames.sort((a,b)=>{
+                return a.frame_index - b.frame_index
+            })
+        }
         return output_data
     }
     RenderOutputData(output_data){
@@ -88,11 +94,13 @@ function compact_space(animation_state_objects,canvas,ctx){
     let boxes = []
     for (let state_id in animation_state_objects) {
         let state_data = animation_state_objects[state_id]
-        for(let frame of state_data.data.frames){
+        for(let frame_index in state_data.data.frames){
+            let frame = state_data.data.frames[frame_index]
             let {minX,minY,maxX,maxY} = frame.source_bounds
             let width = maxX-minX
             let height = maxY-minY
             boxes.push({
+                frame_index:frame_index,
                 state_id:state_id,
                 reference:frame,
                 w:width,
@@ -125,6 +133,7 @@ function compact_space(animation_state_objects,canvas,ctx){
         let anchor_x = (frame.anchor_pos.x - frame.source_bounds.minX)
         let anchor_y = (frame.anchor_pos.y - frame.source_bounds.minY)
         output_data[box.state_id].frames.push({
+            frame_index:box.frame_index,
             duration: frame.duration,
             x: box.x,
             y: box.y,
@@ -177,7 +186,8 @@ function evenly_space(animation_state_objects,canvas,ctx){
             frames: []
         }
 
-        for (let frame of state_object.data.frames) {
+        for (let frame_index in state_object.data.frames) {
+            let frame = state_object.data.frames[frame_index]
             let { minX, minY, maxX, maxY } = frame.source_bounds
             let width = maxX - minX
             let height = maxY - minY
@@ -188,6 +198,7 @@ function evenly_space(animation_state_objects,canvas,ctx){
             //Draw frames to canvas
             draw_frame_data(frame, ctx, anchored_x, anchored_y)
             output_data[state_id].frames.push({
+                frame_index:frame_index,
                 duration: frame.duration,
                 x: anchored_x,
                 y: anchored_y,
