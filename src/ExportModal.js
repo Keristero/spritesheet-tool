@@ -59,6 +59,7 @@ class ExportModal extends Modal {
     }
     RenderOutputSheet() {
         let animation_state_objects = project_memory_manager.animation_state_objects
+        tag_duplicated_frames(animation_state_objects)
         let output_data = null
         if (this.spacing == "even") {
             output_data = evenly_space(animation_state_objects,this.canvas,this.ctx)
@@ -83,6 +84,31 @@ class ExportModal extends Modal {
     }
 }
 
+function tag_duplicated_frames(animation_state_objects){
+    console.log(animation_state_objects)
+    let unique_frames = {}
+    let frame_to_string = function(frame_data){
+        let {minX, minY, maxX, maxY} = frame_data.source_bounds
+        let {sheet_id} = frame_data
+        return `${sheet_id}_${minX}_${minY}_${maxX}_${maxY}`
+    }
+    for (let state_id in animation_state_objects) {
+        let state_data = animation_state_objects[state_id]
+        for(let frame_index in state_data.data.frames){
+            let frame = state_data.data.frames[frame_index]
+            if(!unique_frames[frame_to_string(frame)]){
+                unique_frames[frame_to_string(frame)] = frame
+                if(frame.duplicate_of){
+                    delete frame.duplicate_of
+                }
+            }else{
+                console.log('detected duplicate frame')
+                frame.duplicate_of = unique_frames[frame_to_string(frame)]
+            }
+        }
+    }
+}
+
 function compact_space(animation_state_objects,canvas,ctx){
     let output_data = {}
     let max_frame_width = 0
@@ -92,20 +118,39 @@ function compact_space(animation_state_objects,canvas,ctx){
 
     //Read frame information
     let boxes = []
+    let frame_box_mapping = []
     for (let state_id in animation_state_objects) {
         let state_data = animation_state_objects[state_id]
         for(let frame_index in state_data.data.frames){
             let frame = state_data.data.frames[frame_index]
-            let {minX,minY,maxX,maxY} = frame.source_bounds
-            let width = maxX-minX
-            let height = maxY-minY
-            boxes.push({
-                frame_index:frame_index,
-                state_id:state_id,
-                reference:frame,
-                w:width,
-                h:height
-            })
+            if(!frame.duplicate_of){
+                //dont bother drawing frames that are already used for other animations
+                let {minX,minY,maxX,maxY} = frame.source_bounds
+                let width = maxX-minX
+                let height = maxY-minY
+                let box = {
+                    frame_index:frame_index,
+                    reference:frame,
+                    w:width,
+                    h:height
+                }
+                boxes.push(box)
+                frame_box_mapping.push({
+                    frame:frame,
+                    box:box,
+                    state_id:state_id
+                })
+            }else{
+                for(let mapping of frame_box_mapping){
+                    if(mapping.frame === frame.duplicate_of){
+                        frame_box_mapping.push({
+                            frame:frame,
+                            box:mapping.box,
+                            state_id:state_id
+                        })
+                    }
+                }
+            }
         }
     }
 
@@ -118,9 +163,7 @@ function compact_space(animation_state_objects,canvas,ctx){
     canvas.height = result.h
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    for(let box of boxes){
-        let frame = box.reference
-        let state_id = box.state_id
+    for(let {frame,box,state_id} of frame_box_mapping){
         draw_frame_data(frame, ctx, box.x, box.y)
         if(!output_data[state_id]){
             let state_object = animation_state_objects[state_id]
@@ -132,7 +175,7 @@ function compact_space(animation_state_objects,canvas,ctx){
         }
         let anchor_x = (frame.anchor_pos.x - frame.source_bounds.minX)
         let anchor_y = (frame.anchor_pos.y - frame.source_bounds.minY)
-        output_data[box.state_id].frames.push({
+        output_data[state_id].frames.push({
             frame_index:box.frame_index,
             duration: frame.duration,
             x: box.x,
@@ -240,7 +283,12 @@ function output_data_to_animation_format(output_data){
                 animation_state.frames.reverse()
             }
             for(let frame of animation_state.frames){
-                let {duration,x,y,width,height,anchor_x,anchor_y} = frame
+                let frame_ref = frame
+                if(frame.duplicate_of){
+                    frame_ref = frame.duplicate_of
+                }
+                let {x,y,width,height} = frame_ref
+                let {duration,anchor_x,anchor_y} = frame
 
                 out_flipped_x = frame.flip_x ? !flip_x : flip_x
                 out_flipped_y = frame.flip_y ? !flip_y : flip_y
