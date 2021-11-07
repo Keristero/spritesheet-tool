@@ -8,6 +8,7 @@ const btn_add_state = document.getElementById("btn_add_state");
 const btn_select_all = document.getElementById("btn_select_all");
 const btn_import_all = document.getElementById("btn_import_all");
 const keyboard = new Keyboard()
+let replacement_pending = false
 
 btn_add_state.onclick = () => {
     project_memory_manager.NewAnimationState()
@@ -55,7 +56,15 @@ async function process_input_images(images){
     for (let image of images) {
         console.log(image.name)
         let image_url = await read_file_as_image_url(image)
-        project_memory_manager.NewInputSheet(image_url,image.name)
+        if(replacement_pending === false){
+            project_memory_manager.NewInputSheet(image_url,image.name)
+        }else{
+            if(images.length != 1){
+                window.alert("copy a single image at a time for replacing sheets")
+            }
+            project_memory_manager.NewInputSheet(image_url,image.name,replacement_pending)
+            replacement_pending = false
+        }
     }
 }
 
@@ -107,3 +116,12 @@ function GetImagesFromClipboard(e) {
     }
     return images
 }
+
+setInterval(()=>{
+    if(keyboard.KeyIsHeld("Escape")){
+        if(replacement_pending !== false){
+            window.alert(`Canceled replacement of input sheet (${replacement_pending})`)
+            replacement_pending = false
+        }
+    }
+},16)

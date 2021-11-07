@@ -37,7 +37,7 @@ Method 2 (host webserver)
 1. add manual anchor point selection ✅
 1. allow selection of multiple frames from the same animation
     - allow selection ✅
-    - allow hold ctrl selection 
+    - allow hold ctrl selection ✅
     - allow deselection by clicking on blank spot ✅
     - allow drag box selection ✅
 1. super duper refactor ✅
@@ -49,7 +49,7 @@ Method 2 (host webserver)
     - renaming ✅
     - store images in project file ✅
     - dont copy images ✅
-1. Add project loading
+1. Add project loading ✅
     - load input sheets ✅
     - load animation states ✅
 1. create modal object for export / detailed image import ✅
@@ -82,7 +82,7 @@ Method 2 (host webserver)
 
 1. Add a clone animation state button which prompts you for a new name, and if you want to flip the X or Y ✅
     1. cant be edited, its a flipped clone of another state ✅
-1. Dont copy trasparent color pixels into imported frames
+1. Dont copy trasparent color pixels into imported frames ✅
 1. ensure pixels are not being cut off on the far right and bottom of selection ✅
 1. add button to automatically import all frames from a sheet to the current animation state ✅
 1. add button to automatically import all frames from ALL sheets ✅
@@ -105,6 +105,7 @@ Method 2 (host webserver)
 1. Save tab minimise state to project ✅
 1. Add collapse all tabs button
 1. Add drag and drop ✅
+1. Alow replacement of image in input sheet from clipboard ✅
 1. allow drag and drop insert of InputSheets from URL's
 1. make purpose of tabs more obvious ✅
 1. shrink frame selection canvas after removal of frames ✅

@@ -177,11 +177,22 @@ class ProjectMemoryManager{
             throw(e)
         }
     }
-    async NewInputSheet(image_url,image_name){
+    async NewInputSheet(image_url,image_name,next_id){
         let url = window.URL || window.webkitURL;
 
+        if(next_id == undefined){
+            next_id = this.memory.next_input_sheet_id
+        }else{
+            //Remove existing sheet element if it already exists
+            if(this.input_sheet_objects[next_id]){
+                let sheet_object = this.input_sheet_objects[next_id]
+                sheet_object.DeleteSelf()
+            }
+        }
+        console.log('next_id=',next_id)
+
         let initial_data = {
-            id:this.memory.next_input_sheet_id,
+            id:next_id,
             image_name,
             image_url
         }
@@ -189,6 +200,7 @@ class ProjectMemoryManager{
         this.memory.input_sheets[initial_data.id] = initial_data
         this.PrepareInputSheet(initial_data)
         this.memory.next_input_sheet_id++
+        replacement_pending = false
     }
     NewAnimationState(){
         let initial_data = {

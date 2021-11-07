@@ -63,6 +63,14 @@ class InputSheet extends CanvasContainer{
         let btn_delete_sheet = create_and_append_element('button',this.div_settings)
         btn_delete_sheet.textContent = "Remove Input Sheet"
         btn_delete_sheet.onclick = ()=>{this.DeleteSelf()}
+
+        let btn_replace_sheet = create_and_append_element('button',this.div_settings)
+        btn_replace_sheet.textContent = "Replace Sheet"
+        btn_replace_sheet.onclick = ()=>{
+            console.log(this.id)
+            window.alert(`paste an image to replace this input sheet (${this.id}), Escape to cancel`)
+            replacement_pending= this.id
+        }
     }
     GetSelectedFrames(){
         console.log(project_memory_manager.memory.selected_animation_state_id)
