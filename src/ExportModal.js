@@ -185,7 +185,8 @@ function compact_space(animation_state_objects,canvas,ctx){
             anchor_x: anchor_x,
             anchor_y: anchor_y,
             flip_x: frame.flip_x,
-            flip_y: frame.flip_y
+            flip_y: frame.flip_y,
+            custom_points: frame.custom_points
         })
     }
     console.log('drew compact spacing')
@@ -250,7 +251,8 @@ function evenly_space(animation_state_objects,canvas,ctx){
                 anchor_x: anchor_x,
                 anchor_y: anchor_y,
                 flip_x: frame.flip_x,
-                flip_y: frame.flip_y
+                flip_y: frame.flip_y,
+                custom_points: frame.custom_points
             })
             x += max_frame_width
         }
@@ -283,6 +285,7 @@ function output_data_to_animation_format(output_data){
                 animation_state.frames.reverse()
             }
             for(let frame of animation_state.frames){
+                console.log("FRAME=",frame)
                 let frame_ref = frame
                 if(frame.duplicate_of){
                     frame_ref = frame.duplicate_of
@@ -305,6 +308,12 @@ function output_data_to_animation_format(output_data){
                     output_txt += ` flipy="1"`
                 }
                 output_txt += `\n`
+                if(frame.custom_points){
+                    for(let point_name in frame.custom_points){
+                        let point_pos = frame.custom_points[point_name]
+                        output_txt += `point label="${point_name}" x="${point_pos.x}" y="${point_pos.y}"\n`
+                    }
+                }
             }
             if(reverse){
                 //Reverse the array again when we are done to put it back in the correct order

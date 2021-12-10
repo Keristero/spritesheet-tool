@@ -36,6 +36,22 @@ class FrameEditorModal extends Modal {
         option_anchor.selected = true
         option_anchor.textContent = "anchor"
         option_anchor.value = "anchor"
+        
+        this.custom_anchor_name = create_and_append_element('input', this.element)
+        this.custom_anchor_name.type = "text"
+
+        this.custom_anchor_new = create_and_append_element('button', this.element)
+        this.custom_anchor_new.textContent = "Add new point type"
+        this.custom_anchor_new.onclick = ()=>{
+            if(!this.custom_anchor_name.value || this.custom_anchor_name.value == ""){
+                window.alert("Please enter a new for the new custom point")
+                return
+            }
+            let option_custom = create_and_append_element('option', this.select_point_name)
+            option_custom.selected = true
+            option_custom.textContent = this.custom_anchor_name.value
+            option_custom.value = this.custom_anchor_name.value
+        }
 
         this.quick_point_select = new QuickPointSelect((x,y)=>{
             let frames = this.GetSelectedFrames()
@@ -148,9 +164,19 @@ class FrameEditorModal extends Modal {
         //console.log(canvas_scale_x,canvas_scale_y)
         let x = Math.floor(e.offsetX/canvas_scale_x)
         let y = Math.floor(e.offsetY/canvas_scale_y)
-        for (let frame_index in this.selected_frame_indexes) {
-            let frame = this.frames[frame_index]
-            frame.anchor_pos = {x:x+frame.source_bounds.minX,y:y+frame.source_bounds.minY}
+        if(this.select_point_name.value == "anchor"){
+            for (let frame_index in this.selected_frame_indexes) {
+                let frame = this.frames[frame_index]
+                frame.anchor_pos = {x:x+frame.source_bounds.minX,y:y+frame.source_bounds.minY}
+            }
+        }else{
+            for (let frame_index in this.selected_frame_indexes) {
+                let frame = this.frames[frame_index]
+                if(!frame.custom_points){
+                    frame.custom_points = {}
+                }
+                frame.custom_points[this.select_point_name.value] = {x:x+frame.source_bounds.minX,y:y+frame.source_bounds.minY}
+            }
         }
     }
     DetectLargestFrame(){
@@ -172,17 +198,28 @@ class FrameEditorModal extends Modal {
         let frames = this.GetSelectedFrames()
         for (let frame of frames) {
             draw_frame_data(frame, this.ctx, 0, 0)
-            this.DrawAnchorForFrame(frame)
+            this.DrawPointsForFrame(frame)
         }
     }
-    DrawAnchorForFrame(frame){
+    DrawPointsForFrame(frame){
         if(frame.anchor_pos){
+            this.DrawCustomPointForFrame(frame,frame.anchor_pos,'rgba(255,0,0,0.5)')
+        }
+        if(frame.custom_points){
+            for(let point_name in frame.custom_points){
+                let point_pos = frame.custom_points[point_name]
+                this.DrawCustomPointForFrame(frame,point_pos,'rgba(0,0,255,0.5)')
+            }
+        }
+    }
+    DrawCustomPointForFrame(frame,position,color){
+        if(position){
             let {minX,minY} = frame.source_bounds
-            let {x,y} = frame.anchor_pos
+            let {x,y} = position
             let local_x = x-minX
             let local_y = y-minY
             console.log('local',local_x,local_y)
-            this.ctx.fillStyle = 'rgba(255,0,0,0.5)'
+            this.ctx.fillStyle = color
             this.ctx.fillRect(local_x-3,local_y,7,1)
             this.ctx.fillRect(local_x,local_y-3,1,7)
         }
