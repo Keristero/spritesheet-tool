@@ -20,45 +20,6 @@ Method 2 (host webserver)
 1. export the spritesheet and .animation file by clicking export then copying the output.
 
 ## todo
-### V1
-1. allow selection of transparent color, default it to the top left pixel ✅
-1. add button to delete input sheets ✅
-1. allow adding, removing, and selection of animation states ✅
-1. add current bounding box to selected animation state ✅
-1. add per frame OR entire default animation settings ✅
-    1. duration ✅
-    1. anchor ✅
-    1. flipx ✅
-    1. flipy ✅
-1. auto select first added animation ✅
-1. add zoom scaling ✅
-    - you can zoom the web page and the pixel scaling does not break too badly ✅
-1. add animation preview ✅
-1. add manual anchor point selection ✅
-1. allow selection of multiple frames from the same animation
-    - allow selection ✅
-    - allow hold ctrl selection ✅
-    - allow deselection by clicking on blank spot ✅
-    - allow drag box selection ✅
-1. super duper refactor ✅
-    - make state serializable in preperation for project saving and loading ✅
-1. Add project saving
-    - save button ✅
-    - load button ✅
-    - serialize images correctly ✅
-    - renaming ✅
-    - store images in project file ✅
-    - dont copy images ✅
-1. Add project loading ✅
-    - load input sheets ✅
-    - load animation states ✅
-1. create modal object for export / detailed image import ✅
-    - Pop up modal ✅
-    - Close modal ✅
-1. add image export ✅
-    - export evenly spaced images ✅
-1. allow export of ONB compatible .animation files ✅
-1. seperate frame selection canvas from the selection overlay (should hide selection in frame previews) ✅
 
 ### V1.1
 1. decouple frame select from animation state ✅
@@ -70,13 +31,14 @@ Method 2 (host webserver)
         - list of frames you can select to modify ✅
         - when you are importing frames and you press the import button, remove the frame from the list and select the next one ✅
         - set anchor point ✅
-        - set other custom points
+        - set other custom points ✅
         - allow fine adjustment of origin bounds
 
-1. add custom points to exported data
-    - allow configuration of custom points
-    - allow export of custom points
-    - allow editing of custom points
+1. add custom points to exported data ✅
+    - allow configuration of custom points ✅
+    - allow export of custom points ✅
+    - allow editing of custom points ✅
+    - allow deletion of custom points ✅
 1. Add quick anchor point selection (relative to center, top, bottom, left, or right) ✅
     - for new frames ✅
 
@@ -110,6 +72,6 @@ Method 2 (host webserver)
 1. make purpose of tabs more obvious ✅
 1. shrink frame selection canvas after removal of frames ✅
 1. add feedback for when you add a frame
-1. add a way to reorder frames
+1. add a way to reorder frames ✅
 1. add feedback for save button ✅
 1. add save file button in export for the .png and .animation file

@@ -32,25 +32,61 @@ class FrameEditorModal extends Modal {
         this.canvas.style.height = "70%"
 
         this.select_point_name = create_and_append_element('select', this.element)
-        let option_anchor = create_and_append_element('option', this.select_point_name)
-        option_anchor.selected = true
-        option_anchor.textContent = "anchor"
-        option_anchor.value = "anchor"
-        
-        this.custom_anchor_name = create_and_append_element('input', this.element)
-        this.custom_anchor_name.type = "text"
+        this.select_point_name.addEventListener('change',(e)=>{
 
-        this.custom_anchor_new = create_and_append_element('button', this.element)
-        this.custom_anchor_new.textContent = "Add new point type"
-        this.custom_anchor_new.onclick = ()=>{
-            if(!this.custom_anchor_name.value || this.custom_anchor_name.value == ""){
+        })
+
+        this.option_anchor = create_and_append_element('option', this.select_point_name)
+        this.option_anchor.selected = true
+        this.option_anchor.textContent = "anchor"
+        this.option_anchor.value = "anchor"
+        if(project_memory_manager?.memory?.custom_points){
+            //load custom points
+            for(let custom_point_name in project_memory_manager.memory.custom_points){
+                this.AddCustomPointOption(custom_point_name)
+            }
+        }
+        
+        this.custom_point_name = create_and_append_element('input', this.element)
+        this.custom_point_name.type = "text"
+
+        this.custom_point_color = create_and_append_element('input', this.element)
+        this.custom_point_color.type = "color"
+
+        this.custom_point_new = create_and_append_element('button', this.element)
+        this.custom_point_new.textContent = "Add new point type"
+        this.custom_point_new.onclick = ()=>{
+            let new_custom_point_name = this.custom_point_name.value
+            let new_custom_point_color = this.custom_point_color.value
+            if(!new_custom_point_name || new_custom_point_name == ""){
                 window.alert("Please enter a new for the new custom point")
                 return
             }
-            let option_custom = create_and_append_element('option', this.select_point_name)
-            option_custom.selected = true
-            option_custom.textContent = this.custom_anchor_name.value
-            option_custom.value = this.custom_anchor_name.value
+            if(!new_custom_point_color || new_custom_point_color == ""){
+                window.alert("Please select a color for the new custom point")
+                return
+            }
+            project_memory_manager.UpdateCustomPoint(new_custom_point_name,new_custom_point_color)
+            this.AddCustomPointOption(new_custom_point_name)
+            this.custom_point_name.value = ""
+        }
+
+        this.custom_point_remove = create_and_append_element('button', this.element)
+        this.custom_point_remove.textContent = "Remove selected point"
+        this.custom_point_remove.onclick = ()=>{
+            let selected_point_name = this.select_point_name.value
+            if(selected_point_name == "anchor"){
+                window.alert('Anchor is a reserved point, and cannot be removed')
+                return
+            }
+            if(window.confirm(`Warning, this will remove the custom point ${selected_point_name} from every frame in your project`)){
+                if(project_memory_manager.RemoveCustomPoint(selected_point_name)){
+                    if(this.RemoveCustomPointOption(selected_point_name)){
+                        this.option_anchor.selected = true
+                    }
+                }
+            }
+
         }
 
         this.quick_point_select = new QuickPointSelect((x,y)=>{
@@ -107,6 +143,30 @@ class FrameEditorModal extends Modal {
             }
         })
 
+    }
+    AddCustomPointOption(point_name){
+        if(point_name.toLowerCase() == "anchor"){
+            window.alert(`Cant add a point with reserved name Anchor`)
+        }
+        if(!this.already_added_points){
+            this.already_added_points = {}
+        }
+        if(!this.already_added_points[point_name]){
+            let option_custom = create_and_append_element('option', this.select_point_name)
+            option_custom.selected = true
+            option_custom.textContent = point_name
+            option_custom.value = point_name
+            this.already_added_points[point_name] = option_custom
+        }else{
+            return
+        }
+    }
+    RemoveCustomPointOption(point_name){
+        if(this.already_added_points[point_name]){
+            this.already_added_points[point_name].remove()
+            delete this.already_added_points[point_name]
+            return true
+        }
     }
     ImportSelected(){
         let frames = this.GetSelectedFrames()
@@ -167,7 +227,12 @@ class FrameEditorModal extends Modal {
         if(this.select_point_name.value == "anchor"){
             for (let frame_index in this.selected_frame_indexes) {
                 let frame = this.frames[frame_index]
-                frame.anchor_pos = {x:x+frame.source_bounds.minX,y:y+frame.source_bounds.minY}
+                if(e.button == 0){
+                    //left click
+                    frame.anchor_pos = {x:x+frame.source_bounds.minX,y:y+frame.source_bounds.minY}
+                }else{
+                    frame.anchor_pos = null
+                }
             }
         }else{
             for (let frame_index in this.selected_frame_indexes) {
@@ -175,7 +240,14 @@ class FrameEditorModal extends Modal {
                 if(!frame.custom_points){
                     frame.custom_points = {}
                 }
-                frame.custom_points[this.select_point_name.value] = {x:x+frame.source_bounds.minX,y:y+frame.source_bounds.minY}
+                if(e.button == 0){
+                    //left click
+                    frame.custom_points[this.select_point_name.value] = {x:x+frame.source_bounds.minX,y:y+frame.source_bounds.minY}
+                }else{
+                    if(frame.custom_points[this.select_point_name.value]){
+                        delete frame.custom_points[this.select_point_name.value]
+                    }
+                }
             }
         }
     }
@@ -206,10 +278,16 @@ class FrameEditorModal extends Modal {
             this.DrawCustomPointForFrame(frame,frame.anchor_pos,'rgba(255,0,0,0.5)')
         }
         if(frame.custom_points){
+            this.ctx.globalAlpha = 0.5
             for(let point_name in frame.custom_points){
                 let point_pos = frame.custom_points[point_name]
-                this.DrawCustomPointForFrame(frame,point_pos,'rgba(0,0,255,0.5)')
+                let point_color = 'rgba(0,0,255,0.5)'
+                if(project_memory_manager?.memory?.custom_points[point_name]){
+                    point_color = project_memory_manager.memory.custom_points[point_name]
+                }
+                this.DrawCustomPointForFrame(frame,point_pos,point_color)
             }
+            this.ctx.globalAlpha = 1
         }
     }
     DrawCustomPointForFrame(frame,position,color){
@@ -218,7 +296,6 @@ class FrameEditorModal extends Modal {
             let {x,y} = position
             let local_x = x-minX
             let local_y = y-minY
-            console.log('local',local_x,local_y)
             this.ctx.fillStyle = color
             this.ctx.fillRect(local_x-3,local_y,7,1)
             this.ctx.fillRect(local_x,local_y-3,1,7)
@@ -236,6 +313,7 @@ class FrameEditorModal extends Modal {
     OpenModal() {
         this.RescaleCanvasToScreen()
         super.OpenModal()
+        this.option_anchor.selected = true
         this.on_select_changed = ()=>{
             this.RefreshFrameProperties()
         }

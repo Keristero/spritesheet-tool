@@ -272,6 +272,28 @@ class ProjectMemoryManager{
         }
         return null
     }
+    UpdateCustomPoint(name,color){
+        if(!this.memory.custom_points){
+            this.memory.custom_points = {}
+        }
+        this.memory.custom_points[name] = color
+    }
+    RemoveCustomPoint(name){
+        if(this?.memory?.custom_points?.[name]){
+            delete this?.memory?.custom_points?.[name]
+            for(let animation_state_name in this.memory.animation_states){
+                let animation_state = this.memory.animation_states[animation_state_name]
+                for(let frame of animation_state.frames){
+                    if(frame.custom_points[name]){
+                        delete frame.custom_points[name]
+                    }
+                }
+                console.log('state',animation_state)
+            }
+            return true
+        }
+        return false
+    }
 }
 
 const project_memory_manager = new ProjectMemoryManager()
