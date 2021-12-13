@@ -36,7 +36,15 @@ class ProjectMemoryManager{
                 let fileReader = new FileReader();
                 fileReader.onload = (fileLoadedEvent)=>{
                     let loaded_text = fileLoadedEvent.currentTarget.result;
-                    this.LoadProject(loaded_text)
+                    let file_name = inp_load_project.files[0].name
+                    let file_extension = file_name.match(/\.[0-9a-z]+$/i);
+                    console.log(`got a ${file_extension} file (${file_name})`)
+                    if(file_extension == '.json'){
+                        this.LoadProject(loaded_text)
+                    }else if(file_extension == '.animation'){
+                        let parsed_json = ParseONBAnimation(loaded_text)
+                        this.LoadProject(parsed_json)
+                    }
                 };
                 fileReader.readAsText(inp_load_project.files[0], "UTF-8");
             }catch(e){
@@ -98,7 +106,8 @@ class ProjectMemoryManager{
             next_animation_state_id:0,
             selected_animation_state_id:null,
             animation_states:{},
-            input_sheets:{}
+            input_sheets:{},
+            custom_points:{}
         }
         this.is_project_loaded = true
     }

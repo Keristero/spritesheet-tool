@@ -31,63 +31,7 @@ class FrameEditorModal extends Modal {
         this.ctx.imageSmoothingEnabled = false
         this.canvas.style.height = "70%"
 
-        this.select_point_name = create_and_append_element('select', this.element)
-        this.select_point_name.addEventListener('change',(e)=>{
-
-        })
-
-        this.option_anchor = create_and_append_element('option', this.select_point_name)
-        this.option_anchor.selected = true
-        this.option_anchor.textContent = "anchor"
-        this.option_anchor.value = "anchor"
-        if(project_memory_manager?.memory?.custom_points){
-            //load custom points
-            for(let custom_point_name in project_memory_manager.memory.custom_points){
-                this.AddCustomPointOption(custom_point_name)
-            }
-        }
-        
-        this.custom_point_name = create_and_append_element('input', this.element)
-        this.custom_point_name.type = "text"
-
-        this.custom_point_color = create_and_append_element('input', this.element)
-        this.custom_point_color.type = "color"
-
-        this.custom_point_new = create_and_append_element('button', this.element)
-        this.custom_point_new.textContent = "Add new point type"
-        this.custom_point_new.onclick = ()=>{
-            let new_custom_point_name = this.custom_point_name.value
-            let new_custom_point_color = this.custom_point_color.value
-            if(!new_custom_point_name || new_custom_point_name == ""){
-                window.alert("Please enter a new for the new custom point")
-                return
-            }
-            if(!new_custom_point_color || new_custom_point_color == ""){
-                window.alert("Please select a color for the new custom point")
-                return
-            }
-            project_memory_manager.UpdateCustomPoint(new_custom_point_name,new_custom_point_color)
-            this.AddCustomPointOption(new_custom_point_name)
-            this.custom_point_name.value = ""
-        }
-
-        this.custom_point_remove = create_and_append_element('button', this.element)
-        this.custom_point_remove.textContent = "Remove selected point"
-        this.custom_point_remove.onclick = ()=>{
-            let selected_point_name = this.select_point_name.value
-            if(selected_point_name == "anchor"){
-                window.alert('Anchor is a reserved point, and cannot be removed')
-                return
-            }
-            if(window.confirm(`Warning, this will remove the custom point ${selected_point_name} from every frame in your project`)){
-                if(project_memory_manager.RemoveCustomPoint(selected_point_name)){
-                    if(this.RemoveCustomPointOption(selected_point_name)){
-                        this.option_anchor.selected = true
-                    }
-                }
-            }
-
-        }
+        this.PreparePointSelectionHTML()
 
         this.quick_point_select = new QuickPointSelect((x,y)=>{
             let frames = this.GetSelectedFrames()
@@ -143,6 +87,76 @@ class FrameEditorModal extends Modal {
             }
         })
 
+    }
+    PreparePointSelectionHTML(){
+        this.already_added_points = {}
+        if(this.custom_point_div){
+            this.element.removeChild(this.custom_point_div)
+            delete this.custom_point_div
+        }
+        this.custom_point_div = create_and_append_element('div', this.element)
+
+        this.select_point_name = create_and_append_element('select', this.custom_point_div)
+        this.select_point_name.addEventListener('change',(e)=>{
+
+        })
+
+        this.option_anchor = create_and_append_element('option', this.select_point_name)
+        this.option_anchor.selected = true
+        this.option_anchor.textContent = "anchor"
+        this.option_anchor.value = "anchor"
+        console.log("LOADING CUSTOM POINTS")
+        if(project_memory_manager?.memory?.custom_points){
+            //load custom points
+            console.log('points',project_memory_manager?.memory?.custom_points)
+            for(let custom_point_name in project_memory_manager.memory.custom_points){
+                this.AddCustomPointOption(custom_point_name)
+            }
+        }
+        
+        this.custom_point_name = create_and_append_element('input', this.custom_point_div)
+        this.custom_point_name.type = "text"
+
+        this.custom_point_color = create_and_append_element('input', this.custom_point_div)
+        this.custom_point_color.type = "color"
+
+        this.custom_point_new = create_and_append_element('button', this.custom_point_div)
+        this.custom_point_new.textContent = "Add new point type"
+        this.custom_point_new.onclick = ()=>{
+            let new_custom_point_name = this.custom_point_name.value
+            let new_custom_point_color = this.custom_point_color.value
+            if(!new_custom_point_name || new_custom_point_name == ""){
+                window.alert("Please enter a new for the new custom point")
+                return
+            }
+            if(!new_custom_point_color || new_custom_point_color == ""){
+                window.alert("Please select a color for the new custom point")
+                return
+            }
+            let rgba_color = hexToRgbA(new_custom_point_color,0.5)
+            console.log(rgba_color)
+            project_memory_manager.UpdateCustomPoint(new_custom_point_name,rgba_color)
+            this.AddCustomPointOption(new_custom_point_name)
+            this.custom_point_name.value = ""
+        }
+
+        this.custom_point_remove = create_and_append_element('button', this.custom_point_div)
+        this.custom_point_remove.textContent = "Remove selected point"
+        this.custom_point_remove.onclick = ()=>{
+            let selected_point_name = this.select_point_name.value
+            if(selected_point_name == "anchor"){
+                window.alert('Anchor is a reserved point, and cannot be removed')
+                return
+            }
+            if(window.confirm(`Warning, this will remove the custom point ${selected_point_name} from every frame in your project`)){
+                if(project_memory_manager.RemoveCustomPoint(selected_point_name)){
+                    if(this.RemoveCustomPointOption(selected_point_name)){
+                        this.option_anchor.selected = true
+                    }
+                }
+            }
+
+        }
     }
     AddCustomPointOption(point_name){
         if(point_name.toLowerCase() == "anchor"){
@@ -278,7 +292,6 @@ class FrameEditorModal extends Modal {
             this.DrawCustomPointForFrame(frame,frame.anchor_pos,'rgba(255,0,0,0.5)')
         }
         if(frame.custom_points){
-            this.ctx.globalAlpha = 0.5
             for(let point_name in frame.custom_points){
                 let point_pos = frame.custom_points[point_name]
                 let point_color = 'rgba(0,0,255,0.5)'
@@ -287,7 +300,6 @@ class FrameEditorModal extends Modal {
                 }
                 this.DrawCustomPointForFrame(frame,point_pos,point_color)
             }
-            this.ctx.globalAlpha = 1
         }
     }
     DrawCustomPointForFrame(frame,position,color){
@@ -312,6 +324,7 @@ class FrameEditorModal extends Modal {
     }
     OpenModal() {
         this.RescaleCanvasToScreen()
+        this.PreparePointSelectionHTML()
         super.OpenModal()
         this.option_anchor.selected = true
         this.on_select_changed = ()=>{
