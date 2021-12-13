@@ -223,6 +223,7 @@ class AnimationState extends CanvasContainer{
         //Per frame settings
         this.div_frame_settings = create_and_append_element('div',this.div_settings)
         
+        
         let btn_remove_frame = create_and_append_element('button',this.div_frame_settings)
         btn_remove_frame.textContent = "Remove Frame"
         btn_remove_frame.onclick = ()=>{
@@ -231,19 +232,35 @@ class AnimationState extends CanvasContainer{
         }
 
         let btn_edit_frame = create_and_append_element('button',this.div_frame_settings)
-        btn_edit_frame.textContent = "Edit Frame"
+        btn_edit_frame.textContent = "Edit Frames"
         btn_edit_frame.onclick = ()=>{
-            frame_editor_modal.EditFrames(this.data.frames)
+            frame_editor_modal.EditFrames(this.data.frames.filter((frame,index)=>{
+                if(this.selected_frame_indexes[index]){
+                    return frame
+                }
+            }))
+        }
+
+        let btn_shift_left = create_and_append_element('button',this.div_frame_settings)
+        btn_shift_left.textContent = "Shift Left"
+        btn_shift_left.onclick = ()=>{
+            swap_array_elements_left(this.data.frames,this.selected_frame_indexes)
+        }
+
+        let btn_shift_right = create_and_append_element('button',this.div_frame_settings)
+        btn_shift_right.textContent = "Shift Right"
+        btn_shift_right.onclick = ()=>{
+            swap_array_elements_right(this.data.frames,this.selected_frame_indexes)
         }
 
         this.p_frame_props = create_and_append_element('p',this.div_frame_settings)
     }
     GetSelectedFrames(){
-        let selected_frames = []
-        for(let frame_index in this.selected_frame_indexes){
-            selected_frames.push(this.data.frames[parseInt(frame_index)])
-        }
-        return selected_frames
+        return this.data.frames.filter((frame,index)=>{
+            if(this.selected_frame_indexes[index]){
+                return frame
+            }
+        })
     }
 }
 

@@ -80,3 +80,32 @@ function removeColor(ctx_image_data,color){
     }
     return ctx_image_data
 }
+
+function swap_array_elements_left(array,indexes){
+    /* accepts an object with indexes as keys, will shift each of those indexes in the array one to the left if it can 
+    let somearr = ["apple","banana","cola","sushi","mountain dew"]
+    let selected_indexes = {0:true,3:true,4:true}
+    swap_array_elements_left(somearr,selected_indexes)
+    console.log(somearr) // [ 'apple', 'banana', 'sushi', 'mountain dew', 'cola' ]
+    */
+    for(let i = 1; i < array.length; i++){
+        if(indexes[i] && !indexes[i-1]){
+            let left_element = array[i-1]
+            array[i-1] = array.splice(i,1,left_element)[0]
+            delete indexes[i]
+            indexes[i-1] = true
+        }
+    }
+}
+
+function swap_array_elements_right(array,indexes){
+    /* accepts an object with indexes as keys, will shift each of those indexes in the array one to the right if it can */
+    for(let i = array.length-2; i >= 0; i--){
+        if(indexes[i] && !indexes[i+1]){
+            let left_element = array[i]
+            array[i] = array.splice(i+1,1,left_element)[0]
+            delete indexes[i]
+            indexes[i+1] = true
+        }
+    }
+}
