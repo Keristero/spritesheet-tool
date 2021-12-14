@@ -10,12 +10,13 @@ class FrameEditorModal extends Modal {
         if (this.is_open) {
             this.frame_select.DrawIfRequired()
             this.DrawFrame()
+            this.animation_state_preview.DrawIfRequired()
         }
     }
     PrepareHTML() {
         super.PrepareHTML()
-        this.element.style.width = "100%"
-        this.element.style.height = "100%"
+        this.element.style.width = "95%"
+        this.element.style.height = "95%"
 
         this.btn_cancel.textContent = "Close"
 
@@ -29,7 +30,7 @@ class FrameEditorModal extends Modal {
         this.canvas = create_and_append_element('canvas', div_center_canvas)
         this.ctx = this.canvas.getContext('2d')
         this.ctx.imageSmoothingEnabled = false
-        this.canvas.style.height = "70%"
+        this.canvas.style.height = "50%"
 
         this.PreparePointSelectionHTML()
 
@@ -321,6 +322,7 @@ class FrameEditorModal extends Modal {
             this.element.removeChild(this.frame_select.element)
             delete this.frame_select
         }
+        this.RemoveAnimationStatePreview()
     }
     OpenModal() {
         this.RescaleCanvasToScreen()
@@ -351,6 +353,17 @@ class FrameEditorModal extends Modal {
             this.chk_flip_y.checked = first_frame.flip_y
         }
     }
+    RemoveAnimationStatePreview(){
+        if(this.animation_state_preview){
+            this.element.removeChild(this.animation_state_preview.element)
+            delete this.animation_state_preview
+        }
+    }
+    InitializeAnimationStatePreview(){
+        this.animation_state_preview = new AnimationStatePreview(project_memory_manager.selected_animation_state_object.data)
+        this.element.appendChild(this.animation_state_preview.element)
+        this.animation_state_preview.element.classList.add("top_right_corner")
+    }
     ImportFrames(frames_to_import) {
         this.ResetData()
         this.frames = frames_to_import
@@ -360,6 +373,7 @@ class FrameEditorModal extends Modal {
         this.element.appendChild(this.frame_select.element)
         this.button_import_selected.style.display = "inline"
         this.h3_title.textContent = `Importing frames to Animation State ${project_memory_manager.selected_animation_state_object.data.state_name}`
+        this.InitializeAnimationStatePreview()
         this.OpenModal()
     }
     EditFrames(frames_to_edit) {
@@ -371,6 +385,7 @@ class FrameEditorModal extends Modal {
         this.element.appendChild(this.frame_select.element)
         this.button_import_selected.style.display = "none"
         this.h3_title.textContent = `Editing frames in Animation State ${project_memory_manager.selected_animation_state_object.data.state_name}`
+        this.InitializeAnimationStatePreview()
         this.OpenModal()
     }
 }

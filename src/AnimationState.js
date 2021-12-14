@@ -1,4 +1,4 @@
-class AnimationState extends CanvasContainer{
+class AnimationState extends Container{
     constructor(data){
         let {id} = data
         super(id)
@@ -21,16 +21,20 @@ class AnimationState extends CanvasContainer{
         if(!this.data.clone_states){
             this.data.clone_states = []
         }
+        this.animation_state_preview = new AnimationStatePreview(this.data)
+        this.container.appendChild(this.animation_state_preview.element)
         this.AddControlsPane()
         this.selected = false
         this.selected_frame_indexes = {}
         this.frame_select = new FrameSelect({id:0,selected_frame_indexes:this.selected_frame_indexes,frames:this.data.frames})
         this.div_settings.insertBefore(this.frame_select.element,this.div_frame_settings)
-        this.ResetAnimation()
         this.UpdateTabTitle(this.data.state_name)
         if(this.data.collapsed){
             this.ToggleCollapse()
         }
+    }
+    DrawIfRequired(){
+        this.animation_state_preview.DrawIfRequired()
     }
     Select(){
         this.element.style.backgroundColor = "rgba(0,255,0,0.1)"
@@ -84,58 +88,11 @@ class AnimationState extends CanvasContainer{
         }
         return max_height
     }
-    ResetAnimation(){
-        this.ResizeCanvas(this.GetWidestFrameWidthAnchored()*2,this.GetTallestFrameHeightAnchored()*2)
-        if(this.preview && this.preview.next_frame_timeout){
-            clearTimeout(this.preview.next_frame_timeout)
-        }
-        this.preview = {
-            frame_index:0,
-            needs_redraw:true,
-            centerX: parseInt(this.canvas.width/2),
-            centerY: parseInt(this.canvas.height/2),
-            next_frame_timeout:null
-        }
-    }
     ToggleCollapse(){
         let collapsed = super.ToggleCollapse()
         this.data.collapsed = collapsed
     }
-    DrawIfRequired(){
-        if(this.data.frames.length > 0 && this.preview && this.preview.needs_redraw){
-            this.Draw()
-        }
-    }
-    Draw(){
-        let current_frame_data = this.data.frames[this.preview.frame_index]
-        let x = this.preview.centerX - (current_frame_data.anchor_pos.x-current_frame_data.source_bounds.minX)
-        let y = this.preview.centerY - (current_frame_data.anchor_pos.y-current_frame_data.source_bounds.minY)
-        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
-        this.ctx.save();
-        //If the whole animation is flipped, flip
-        if(this.data.flip_x){
-            this.ctx.translate(this.canvas.width, 0);
-            this.ctx.scale(-1, 1);
-        }
-        if(this.data.flip_y){
-            this.ctx.translate(0, this.canvas.height);
-            this.ctx.scale(1, -1);
-        }
-        draw_frame_data(current_frame_data,this.ctx,x,y)
-        this.ctx.restore();
-
-        this.preview.needs_redraw = false
-        this.preview.next_frame_timeout = setTimeout(()=>{
-            this.preview.needs_redraw = true
-            this.preview.frame_index++
-            if(this.preview.frame_index >= this.data.frames.length){
-                this.preview.frame_index = 0
-            }
-            
-        },current_frame_data.duration)
-        return true
-    }
-    AddFlippedState(){
+    AddClonedState(){
         let clone_state = {
             state_name:"",
             flip_x:false,
@@ -143,10 +100,10 @@ class AnimationState extends CanvasContainer{
             speed_multi:1,
             reverse:false
         }
-        this.ShowFlippedState(clone_state)
+        this.ShowClonedState(clone_state)
         this.data.clone_states.push(clone_state)
     }
-    ShowFlippedState(clone_state){
+    ShowClonedState(clone_state){
         let div_clone_state = create_and_append_element('div',this.div_clone_states)
         let p_state_name = create_and_append_element('p',div_clone_state)
         p_state_name.textContent = "Clone Name"
@@ -200,7 +157,7 @@ class AnimationState extends CanvasContainer{
 
         let btn_add_flipped = create_and_append_element('button',this.div_settings)
         btn_add_flipped.textContent = "Add Clone State"
-        btn_add_flipped.onclick = ()=>{this.AddFlippedState()}
+        btn_add_flipped.onclick = ()=>{this.AddClonedState()}
 
         let p_state_name = create_and_append_element('p',this.div_settings)
         p_state_name.textContent = "State Name"
@@ -217,7 +174,7 @@ class AnimationState extends CanvasContainer{
         this.div_clone_states = create_and_append_element('div',this.div_settings)
 
         for(let flipped_state of this.data.clone_states){
-            this.ShowFlippedState(flipped_state)
+            this.ShowClonedState(flipped_state)
         }
 
         //Per frame settings

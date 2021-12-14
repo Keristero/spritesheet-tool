@@ -99,3 +99,16 @@ p{
 select{
     margin-left:0.5em;
 }
+
+.frame_preview_contents{
+    display: flex;
+}
+
+.top_right_corner{
+    width: 30em;
+    height: 20;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+}
