@@ -170,6 +170,14 @@ function compact_space(animation_state_objects,canvas,ctx){
         }
         let anchor_x = (frame.anchor_pos.x - frame.source_bounds.minX)
         let anchor_y = (frame.anchor_pos.y - frame.source_bounds.minY)
+        let localized_custom_points = {}
+        for(let point_name in frame.custom_points){
+            let point = frame.custom_points[point_name]
+            localized_custom_points[point_name] = {
+                x:(point.x - frame.source_bounds.minX),
+                y:(point.y - frame.source_bounds.minY)
+            }
+        }
         output_data[state_id].frames.push({
             frame_index:box.frame_index,
             duration: frame.duration,
@@ -181,7 +189,7 @@ function compact_space(animation_state_objects,canvas,ctx){
             anchor_y: anchor_y,
             flip_x: frame.flip_x,
             flip_y: frame.flip_y,
-            custom_points: frame.custom_points
+            custom_points: localized_custom_points
         })
     }
     console.log('drew compact spacing')
@@ -232,6 +240,14 @@ function evenly_space(animation_state_objects,canvas,ctx){
             let height = maxY - minY
             let anchor_x = (frame.anchor_pos.x - frame.source_bounds.minX)
             let anchor_y = (frame.anchor_pos.y - frame.source_bounds.minY)
+            let localized_custom_points = {}
+            for(let point_name in frame.custom_points){
+                let point = frame.custom_points[point_name]
+                localized_custom_points[point_name] = {
+                    x:(point.x - frame.source_bounds.minX),
+                    y:(point.y - frame.source_bounds.minY)
+                }
+            }
             let anchored_x = half_max_width + (x - anchor_x)
             let anchored_y = half_max_height + (y - anchor_y)
             //Draw frames to canvas
@@ -247,7 +263,7 @@ function evenly_space(animation_state_objects,canvas,ctx){
                 anchor_y: anchor_y,
                 flip_x: frame.flip_x,
                 flip_y: frame.flip_y,
-                custom_points: frame.custom_points
+                custom_points: localized_custom_points
             })
             x += max_frame_width
         }
