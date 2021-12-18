@@ -67,12 +67,6 @@ class ExportModal extends Modal {
         if (this.spacing == "compact") {
             output_data = compact_space(animation_state_objects,this.canvas,this.ctx)
         }
-        for(let animation_state_id in output_data){
-            let animation_state = output_data[animation_state_id]
-            animation_state.frames.sort((a,b)=>{
-                return a.frame_index - b.frame_index
-            })
-        }
         return output_data
     }
     RenderOutputData(output_data){
@@ -104,6 +98,7 @@ function tag_duplicated_frames(animation_state_objects){
             }else{
                 console.log('detected duplicate frame')
                 frame.duplicate_of = unique_frames[frame_to_string(frame)]
+                console.log('dupe frame =',frame)
             }
         }
     }
