@@ -223,7 +223,7 @@ function evenly_space(animation_state_objects,canvas,ctx){
     let x = 0
     let y = 0
     canvas.width = max_frame_width * max_frame_count
-    canvas.height = max_frame_height * animation_state_count
+    canvas.height = (max_frame_height*2) * animation_state_count
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     for (let state_id in animation_state_objects) {
         let state_object = animation_state_objects[state_id]
