@@ -7,7 +7,6 @@ class ExportModal extends Modal {
     }
     PrepareHTML() {
         super.PrepareHTML()
-
         //Spacing option
         let p_spacing = create_and_append_element('p', this.element)
         p_spacing.textContent = "Spritesheet Spacing"
@@ -49,6 +48,22 @@ class ExportModal extends Modal {
                 this.RenderOutput()
             }
         }
+
+        //Download button
+        let btn_download = create_and_append_element('button',this.element)
+        btn_download.textContent = "Download"
+        btn_download.onclick = async() => {
+            let fileContent = this.pre_output_text.textContent;
+            const name = window.prompt('What name would you like to save the file with?');
+            let image_name = `${name}.png`
+            //Download image
+            fileContent = fileContent.replace(/OUTPUTFILENAME/gmi,image_name)
+            await saveTextFile(`${name}${this.format}`, fileContent);
+            saveCanvasAsPNG(this.canvas,image_name)
+        }
+
+        create_and_append_element('br',this.element)
+        create_and_append_element('br',this.element)
 
         //Canvas
         this.canvas = create_and_append_element('canvas', this.element)
@@ -362,18 +377,13 @@ function output_data_to_tsx_format(output_data){
     let {max_frame_width,max_frame_height,max_frame_count,animation_state_count} = parse_information(animation_state_objects)
     let columns = max_frame_count
     let rows = animation_state_count
-    let tsx_file_name = "PUTYOURIMAGENAMEHERE.png"
-    try{
-        tsx_file_name = project_memory_manager.input_sheet_objects[0].image_name
-    }catch(e){
-        //cant find default image name
-    }
+    let tsx_file_name = "OUTPUTFILENAME"
 
     console.log('output data',output_data)
 
     let output_txt = `<?xml version="1.0" encoding="UTF-8"?>
 <tileset version="1.9" tiledversion="1.9.2" name="${tsx_file_name}" tilewidth="${max_frame_width}" tileheight="${max_frame_height}" tilecount="${rows}" columns="${columns}">
-    <image source="./${tsx_file_name}.png" width="${output_data.width}" height="${output_data.height}"/>
+    <image source="./${tsx_file_name}" width="${output_data.width}" height="${output_data.height}"/>
 </tileset>`
     return output_txt
 

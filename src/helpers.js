@@ -12,6 +12,36 @@ function create_and_append_checkbox_with_label(label_text,parent){
     return chk_box
 }
 
+async function saveTextFile(filename, text) {
+    const blob = new Blob([text], { type: 'text/plain' });
+  
+    try {
+      const response = await fetch(URL.createObjectURL(blob));
+      const fileBlob = await response.blob();
+      const fileUrl = URL.createObjectURL(fileBlob);
+  
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = filename;
+      link.click();
+  
+      URL.revokeObjectURL(fileUrl);
+    } catch (error) {
+      console.error('Error saving file:', error);
+    }
+}
+
+function saveCanvasAsPNG(canvas, filename) {
+    canvas.toBlob(function(blob) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }, 'image/png');
+}
+  
+
 function download_json_file(filename,text){
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/text;charset=utf-8,' + text );
