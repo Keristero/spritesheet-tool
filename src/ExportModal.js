@@ -379,10 +379,9 @@ function output_data_to_tsx_format(output_data){
     let rows = animation_state_count
     let tsx_file_name = "OUTPUTFILENAME"
 
-    console.log('output data',output_data)
-
     let output_txt = `<?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.9" tiledversion="1.9.2" name="${tsx_file_name}" tilewidth="${max_frame_width}" tileheight="${max_frame_height}" tilecount="${rows}" columns="${columns}">
+<tileset version="1.9" tiledversion="1.9.2" name="${tsx_file_name}" tilewidth="${max_frame_width}" tileheight="${max_frame_height}" tilecount="${rows}" columns="${columns}" objectalignment="bottom">
+    <tileoffset x="0" y="${Math.floor(max_frame_height/2)}"/>
     <image source="./${tsx_file_name}" width="${output_data.width}" height="${output_data.height}"/>
 </tileset>`
     return output_txt
