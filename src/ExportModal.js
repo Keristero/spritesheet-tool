@@ -36,8 +36,16 @@ class ExportModal extends Modal {
             option_animation.value = ".animation"
             option_animation.textContent = ".animation"
             option_animation.selected = true
+            let option_tsx = create_and_append_element('option', select_format)
+            option_tsx.value = ".tsx"
+            option_tsx.textContent = ".tsx"
             select_format.onchange = () => {
                 this.format = select_format.value
+                if(this.format == ".tsx"){
+                    this.spacing = "even"
+                    option_even.selected = true
+                    option_compact.selected = false
+                }
                 this.RenderOutput()
             }
         }
@@ -74,6 +82,8 @@ class ExportModal extends Modal {
             this.pre_output_text.textContent = JSON.stringify(output_data, null, 4)
         }else if(this.format == ".animation"){
             this.pre_output_text.textContent = output_data_to_animation_format(output_data)
+        }else if(this.format == ".tsx"){
+            this.pre_output_text.textContent = output_data_to_tsx_format(output_data)
         }
     }
 }
@@ -196,8 +206,7 @@ function compact_space(animation_state_objects,canvas,ctx){
     return output_data
 }
 
-function evenly_space(animation_state_objects,canvas,ctx){
-    let output_data = {}
+function parse_information(animation_state_objects){
     let max_frame_width = 0
     let max_frame_height = 0
     let max_frame_count = 0
@@ -217,6 +226,13 @@ function evenly_space(animation_state_objects,canvas,ctx){
         }
         animation_state_count++
     }
+    return {max_frame_width,max_frame_height,max_frame_count,animation_state_count}
+}
+
+function evenly_space(animation_state_objects,canvas,ctx){
+    let output_data = {}
+
+    let {max_frame_width,max_frame_height,max_frame_count,animation_state_count} = parse_information(animation_state_objects)
 
     let half_max_width = max_frame_width / 2
     let half_max_height = max_frame_height / 2
@@ -224,6 +240,8 @@ function evenly_space(animation_state_objects,canvas,ctx){
     let y = 0
     canvas.width = max_frame_width * max_frame_count
     canvas.height = (max_frame_height*2) * animation_state_count
+    output_data.width = canvas.width
+    output_data.height = canvas.height
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     for (let state_id in animation_state_objects) {
         let state_object = animation_state_objects[state_id]
@@ -276,6 +294,89 @@ function evenly_space(animation_state_objects,canvas,ctx){
 
 function output_data_to_animation_format(output_data){
     let output_txt = ""
+    for(let animation_state_id in output_data){
+        let animation_state = output_data[animation_state_id]
+        console.log(animation_state)
+
+        let copies = [{state_name:animation_state.state_name,flip_x:false,flip_y:false,speed_multi:1}]
+
+        for(let clone_state of animation_state.clone_states){
+            copies.push(clone_state)
+        }
+
+        for(let copy of copies){
+            let {state_name,flip_x,flip_y,speed_multi,reverse} = copy
+
+            output_txt += `animation state="${state_name}"\n`
+
+            if(reverse){
+                //Reverse the array if it should be reversed
+                animation_state.frames.reverse()
+            }
+            for(let frame of animation_state.frames){
+                console.log("FRAME=",frame)
+                let frame_ref = frame
+                if(frame.duplicate_of){
+                    frame_ref = frame.duplicate_of
+                }
+                let {x,y,width,height} = frame_ref
+                let {duration,anchor_x,anchor_y} = frame
+
+                out_flipped_x = frame.flip_x ? !flip_x : flip_x
+                out_flipped_y = frame.flip_y ? !flip_y : flip_y
+
+                let frame_duration = round_to_decimal_points(duration/(1000*speed_multi),3)
+
+                
+
+                output_txt += `frame duration="${frame_duration}" x="${x}" y="${y}" w="${width}" h="${height}" originx="${anchor_x}" originy="${anchor_y}"`
+                if(out_flipped_x){
+                    output_txt += ` flipx="1"`
+                }
+                if(out_flipped_y){
+                    output_txt += ` flipy="1"`
+                }
+                output_txt += `\n`
+                if(frame.custom_points){
+                    for(let point_name in frame.custom_points){
+                        let point_pos = frame.custom_points[point_name]
+                        output_txt += `point label="${point_name}" x="${point_pos.x}" y="${point_pos.y}"\n`
+                    }
+                }
+            }
+            if(reverse){
+                //Reverse the array again when we are done to put it back in the correct order
+                animation_state.frames.reverse()
+            }
+
+            //Line break between each animation
+            output_txt += `\n`
+        }
+    }
+    return output_txt
+}
+
+function output_data_to_tsx_format(output_data){
+
+    let animation_state_objects = project_memory_manager.animation_state_objects
+    let {max_frame_width,max_frame_height,max_frame_count,animation_state_count} = parse_information(animation_state_objects)
+    let columns = max_frame_count
+    let rows = animation_state_count
+    let tsx_file_name = "PUTYOURIMAGENAMEHERE.png"
+    try{
+        tsx_file_name = project_memory_manager.input_sheet_objects[0].image_name
+    }catch(e){
+        //cant find default image name
+    }
+
+    console.log('output data',output_data)
+
+    let output_txt = `<?xml version="1.0" encoding="UTF-8"?>
+<tileset version="1.9" tiledversion="1.9.2" name="${tsx_file_name}" tilewidth="${max_frame_width}" tileheight="${max_frame_height}" tilecount="${rows}" columns="${columns}">
+    <image source="./${tsx_file_name}.png" width="${output_data.width}" height="${output_data.height}"/>
+</tileset>`
+    return output_txt
+
     for(let animation_state_id in output_data){
         let animation_state = output_data[animation_state_id]
         console.log(animation_state)
