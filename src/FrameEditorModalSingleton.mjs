@@ -1,3 +1,9 @@
+import Modal from './Modal.mjs'
+import { create_and_append_element,create_and_append_checkbox_with_label,draw_frame_data,hexToRgbA} from './helpers.mjs'
+import QuickPointSelect from './QuickPointSelect.mjs'
+import project_memory_manager from './ProjectMemoryManagerSingleton.mjs'
+import FrameSelect from './FrameSelect.mjs'
+
 class FrameEditorModal extends Modal {
     constructor() {
         super()
@@ -377,3 +383,5 @@ class FrameEditorModal extends Modal {
 
 let frame_editor_modal = new FrameEditorModal()
 document.body.appendChild(frame_editor_modal.element)
+
+export default frame_editor_modal

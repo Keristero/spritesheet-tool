@@ -1,3 +1,7 @@
+import CanvasContainer from "./CanvasContainer.mjs"
+import { draw_frame_data,rect_overlap} from "./helpers.mjs"
+import keyboard from "./KeyboardSingleton.mjs"
+
 class FrameSelect extends CanvasContainer{
     constructor(data){
         let {id,selected_frame_indexes,frames} = data
@@ -121,3 +125,5 @@ class FrameSelect extends CanvasContainer{
         this.DrawSelectionBox()
     }
 }
+
+export default FrameSelect

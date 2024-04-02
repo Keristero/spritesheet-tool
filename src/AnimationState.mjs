@@ -1,3 +1,7 @@
+import CanvasContainer from "./CanvasContainer.mjs"
+import { create_and_append_element,draw_frame_data } from "./helpers.mjs"
+import FrameSelect from "./FrameSelect.mjs"
+
 class AnimationState extends CanvasContainer{
     constructor(data){
         let {id} = data
@@ -234,11 +238,12 @@ class AnimationState extends CanvasContainer{
         let btn_edit_frame = create_and_append_element('button',this.div_frame_settings)
         btn_edit_frame.textContent = "Edit Frames"
         btn_edit_frame.onclick = ()=>{
-            frame_editor_modal.EditFrames(this.data.frames.filter((frame,index)=>{
+            let frames = this.data.frames.filter((frame,index)=>{
                 if(this.selected_frame_indexes[index]){
                     return frame
                 }
-            }))
+            })
+            window.dispatchEvent(new CustomEvent('OpenFrameEditModal', {detail:frames}));
         }
 
         let btn_shift_left = create_and_append_element('button',this.div_frame_settings)
@@ -273,3 +278,5 @@ function get_max_from_object_array(arr,numerical_property){
     }
     return max
 }
+
+export default AnimationState

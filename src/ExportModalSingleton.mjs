@@ -1,3 +1,8 @@
+import Modal from "./Modal.mjs"
+import { create_and_append_element,draw_frame_data,round_to_decimal_points} from "./helpers.mjs"
+import project_memory_manager from "./ProjectMemoryManagerSingleton.mjs"
+import potpack from "../libs/potpack.mjs"
+
 class ExportModal extends Modal {
     constructor() {
         super()
@@ -337,8 +342,8 @@ function output_data_to_animation_format(output_data){
                 let {x,y,width,height} = frame_ref
                 let {duration,anchor_x,anchor_y} = frame
 
-                out_flipped_x = frame.flip_x ? !flip_x : flip_x
-                out_flipped_y = frame.flip_y ? !flip_y : flip_y
+                let out_flipped_x = frame.flip_x ? !flip_x : flip_x
+                let out_flipped_y = frame.flip_y ? !flip_y : flip_y
 
                 let frame_duration = round_to_decimal_points(duration/(1000*speed_multi),3)
 
@@ -389,3 +394,5 @@ function output_data_to_tsx_format(output_data){
 
 let export_modal = new ExportModal()
 document.body.appendChild(export_modal.element)
+
+export default export_modal

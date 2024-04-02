@@ -1,3 +1,9 @@
+import DragDropZone from "./DragDropZone.mjs"
+import InputSheet from "./InputSheet.mjs"
+import AnimationState from "./AnimationState.mjs"
+import { create_and_append_element } from "./helpers.mjs"
+import export_modal from "./ExportModalSingleton.mjs"
+
 class ProjectMemoryManager{
     constructor(){
         this.is_project_loaded = false
@@ -107,7 +113,8 @@ class ProjectMemoryManager{
             selected_animation_state_id:null,
             animation_states:{},
             input_sheets:{},
-            custom_points:{}
+            custom_points:{},
+            replacement_pending:false
         }
         this.is_project_loaded = true
     }
@@ -306,3 +313,4 @@ class ProjectMemoryManager{
 }
 
 const project_memory_manager = new ProjectMemoryManager()
+export default project_memory_manager

@@ -1,3 +1,5 @@
+import CanvasContainer from "./CanvasContainer.mjs"
+
 class QuickPointSelect extends CanvasContainer{
     constructor(click_callback){
         super("unimportant_id")
@@ -35,3 +37,5 @@ class QuickPointSelect extends CanvasContainer{
         }
     }
 }
+
+export default QuickPointSelect

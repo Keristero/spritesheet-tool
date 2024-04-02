@@ -1,3 +1,8 @@
+import CanvasContainer from "./CanvasContainer.mjs"
+import {create_and_append_element,LoadImage,removeColor} from './helpers.mjs'
+import keyboard from "./KeyboardSingleton.mjs"
+import project_memory_manager from "./ProjectMemoryManagerSingleton.mjs"
+
 class InputSheet extends CanvasContainer{
     constructor(data){
         let {image_url,id,image_name} = data
@@ -69,7 +74,7 @@ class InputSheet extends CanvasContainer{
         btn_replace_sheet.onclick = ()=>{
             console.log(this.id)
             window.alert(`paste an image to replace this input sheet (${this.id}), Escape to cancel`)
-            replacement_pending= this.id
+            project_memory_manager.memory.replacement_pending = this.id
         }
     }
     GetSelectedFrames(){
@@ -90,7 +95,8 @@ class InputSheet extends CanvasContainer{
     }
     ImportSelected(){
         let new_frames = this.GetSelectedFrames()
-        frame_editor_modal.ImportFrames(new_frames)
+        window.dispatchEvent(new CustomEvent('OpenFrameImportModal', {detail:new_frames}));
+        //frame_editor_modal.ImportFrames(new_frames)
     }
     CombineSelection(){
         let new_bounds={
@@ -347,3 +353,5 @@ function getPixelByIndex(imageData, index) {
 function pos2index(imageData, x, y) {
     return 4 * (y * imageData.width + x);
 }
+
+export default InputSheet

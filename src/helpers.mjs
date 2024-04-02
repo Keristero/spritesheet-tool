@@ -1,3 +1,5 @@
+import project_memory_manager from "./ProjectMemoryManagerSingleton.mjs"
+
 function create_and_append_element(element_tag,parent){
     let new_element = document.createElement(element_tag)
     parent.appendChild(new_element)
@@ -141,15 +143,32 @@ function swap_array_elements_right(array,indexes){
 }
 
 function hexToRgbA(hex,alpha){
-    var c;
+    let c;
     if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
         c= hex.substring(1).split('');
         if(c.length== 3){
             c= [c[0], c[0], c[1], c[1], c[2], c[2]];
         }
         c= '0x'+c.join('');
-        rgb = [(c>>16)&255, (c>>8)&255, c&255].join(',')
+        let rgb = [(c>>16)&255, (c>>8)&255, c&255].join(',')
         return `rgba(${rgb},${alpha})`;
     }
     throw new Error('Bad Hex');
+}
+
+export {
+    create_and_append_element,
+    create_and_append_checkbox_with_label,
+    saveTextFile,
+    saveCanvasAsPNG,
+    download_json_file,
+    sleep,
+    LoadImage,
+    round_to_decimal_points,
+    rect_overlap,
+    draw_frame_data,
+    removeColor,
+    swap_array_elements_left,
+    swap_array_elements_right,
+    hexToRgbA
 }

@@ -20,6 +20,12 @@ Method 2 (host webserver)
 1. export the spritesheet and .animation file by clicking export then copying the output.
 
 ## todo
+1. refactor code to use modules
+
+1. Fix even export
+
+1. New feature, generating tilesheets
+    1. Add new export options which takes all the frames of an animation state and produces a blob neighbour tileset
 
 ### V1.1
 1. decouple frame select from animation state ✅

@@ -53,3 +53,5 @@ class DragDropZone {
     }
     
 }
+
+export default DragDropZone

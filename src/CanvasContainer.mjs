@@ -1,3 +1,5 @@
+import {create_and_append_element} from './helpers.mjs'
+
 class CanvasContainer{
     constructor(id){
         this.id = id
@@ -168,3 +170,5 @@ class CanvasContainer{
         return {x:x,y:y}
     }
 }
+
+export default CanvasContainer

@@ -1,3 +1,5 @@
+import { create_and_append_element } from "./helpers.mjs"
+
 class Modal{
     constructor(){
         this.is_open = false
@@ -19,3 +21,5 @@ class Modal{
         this.is_open = true
     }
 }
+
+export default Modal

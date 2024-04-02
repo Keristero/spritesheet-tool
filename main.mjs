@@ -1,14 +1,26 @@
+import project_memory_manager from './src/ProjectMemoryManagerSingleton.mjs'
+import keyboard from './src/KeyboardSingleton.mjs'
+import frame_editor_modal from './src/FrameEditorModalSingleton.mjs'
+
 if (navigator.clipboard) {
     console.log("Clipboard API available");
 } else {
     console.error("Clipboard API unavailable");
 }
 
+window.addEventListener('OpenFrameImportModal',(event_data)=>{
+    console.log('caught event',event_data)
+    frame_editor_modal.ImportFrames(event_data.detail)
+})
+window.addEventListener('OpenFrameEditModal',(event_data)=>{
+    console.log('caught event',event_data)
+    frame_editor_modal.EditFrames(event_data.detail)
+})
+
+
 const btn_add_state = document.getElementById("btn_add_state");
 const btn_select_all = document.getElementById("btn_select_all");
 const btn_import_all = document.getElementById("btn_import_all");
-const keyboard = new Keyboard()
-let replacement_pending = false
 
 btn_add_state.onclick = () => {
     project_memory_manager.NewAnimationState()
@@ -56,14 +68,14 @@ async function process_input_images(images){
     for (let image of images) {
         console.log(image.name)
         let image_url = await read_file_as_image_url(image)
-        if(replacement_pending === false){
+        if(project_memory_manager.memory.replacement_pending === false){
             project_memory_manager.NewInputSheet(image_url,image.name)
         }else{
             if(images.length != 1){
                 window.alert("copy a single image at a time for replacing sheets")
             }
             project_memory_manager.NewInputSheet(image_url,image.name,replacement_pending)
-            replacement_pending = false
+            project_memory_manager.memory.replacement_pending = false
         }
     }
 }
@@ -107,7 +119,7 @@ function GetImagesFromClipboard(e) {
     if (imgs == undefined) {
         return false;
     }
-    for (img of imgs) {
+    for (let img of imgs) {
         if (img.type.indexOf("image") == -1) {
             continue;
         }
@@ -119,9 +131,9 @@ function GetImagesFromClipboard(e) {
 
 setInterval(()=>{
     if(keyboard.KeyIsHeld("Escape")){
-        if(replacement_pending !== false){
-            window.alert(`Canceled replacement of input sheet (${replacement_pending})`)
-            replacement_pending = false
+        if(project_memory_manager.memory.replacement_pending !== false){
+            window.alert(`Canceled replacement of input sheet (${project_memory_manager.memory.replacement_pending})`)
+            project_memory_manager.memory.replacement_pending = false
         }
     }
 },16)

@@ -21,3 +21,7 @@ class Keyboard{
         return false
     }
 }
+
+const keyboard = new Keyboard()
+
+export default keyboard
