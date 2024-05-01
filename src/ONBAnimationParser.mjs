@@ -21,6 +21,7 @@ function ParseONBAnimation(animation_txt){
 
     let linetypes = [{label:"frame",regex:regx_frame},{label:"point",regex:regx_point},{label:"state",regex:regx_state},{label:"image_path",regex:regx_imagepath}]
     let current_animation_state = null
+    let current_frame
     for(let line of lines){
         let result = ParseLine(line,linetypes)
         if(result?.label === "state"){
@@ -110,3 +111,5 @@ function ParseLineData(line,regex,type_label){
     }
     return null
 }
+
+export default ParseONBAnimation

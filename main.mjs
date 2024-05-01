@@ -74,7 +74,7 @@ async function process_input_images(images){
             if(images.length != 1){
                 window.alert("copy a single image at a time for replacing sheets")
             }
-            project_memory_manager.NewInputSheet(image_url,image.name,replacement_pending)
+            project_memory_manager.NewInputSheet(image_url,image.name,project_memory_manager.memory.replacement_pending)
             project_memory_manager.memory.replacement_pending = false
         }
     }

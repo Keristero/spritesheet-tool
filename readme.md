@@ -20,7 +20,12 @@ Method 2 (host webserver)
 1. export the spritesheet and .animation file by clicking export then copying the output.
 
 ## todo
-1. refactor code to use modules
+1. nightmare infinity refactor! (this codebase is scary!)
+    1. refactor code to use modules
+        1. almost done ✅
+        1. done
+    1. pull various export types out of the modal singleton
+    1. 
 
 1. Fix even export
 

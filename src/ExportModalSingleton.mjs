@@ -1,5 +1,5 @@
 import Modal from "./Modal.mjs"
-import { create_and_append_element,draw_frame_data,round_to_decimal_points} from "./helpers.mjs"
+import { create_and_append_element,draw_frame_data,round_to_decimal_points,saveTextFile,saveCanvasAsPNG} from "./helpers.mjs"
 import project_memory_manager from "./ProjectMemoryManagerSingleton.mjs"
 import potpack from "../libs/potpack.mjs"
 
@@ -109,7 +109,6 @@ class ExportModal extends Modal {
 }
 
 function tag_duplicated_frames(animation_state_objects){
-    console.log(animation_state_objects)
     let unique_frames = {}
     let frame_to_string = function(frame_data){
         let {minX, minY, maxX, maxY} = frame_data.source_bounds
@@ -126,9 +125,7 @@ function tag_duplicated_frames(animation_state_objects){
                     delete frame.duplicate_of
                 }
             }else{
-                console.log('detected duplicate frame')
                 frame.duplicate_of = unique_frames[frame_to_string(frame)]
-                console.log('dupe frame =',frame)
             }
         }
     }
@@ -180,7 +177,6 @@ function compact_space(animation_state_objects,canvas,ctx){
     }
 
     let result = potpack(boxes)
-    console.log('potpack',result)
 
     let x = 0
     let y = 0
@@ -222,7 +218,6 @@ function compact_space(animation_state_objects,canvas,ctx){
             custom_points: localized_custom_points
         })
     }
-    console.log('drew compact spacing')
     return output_data
 }
 
@@ -235,7 +230,6 @@ function parse_information(animation_state_objects){
     //Read frame information
     for (let state_id in animation_state_objects) {
         let state_data = animation_state_objects[state_id]
-        console.log(state_data)
 
         let widest_in_state = state_data.GetWidestFrameWidthAnchored()
         let tallest_in_state = state_data.GetTallestFrameHeightAnchored()
@@ -260,8 +254,6 @@ function evenly_space(animation_state_objects,canvas,ctx){
     let y = 0
     canvas.width = max_frame_width * max_frame_count
     canvas.height = (max_frame_height*2) * animation_state_count
-    output_data.width = canvas.width
-    output_data.height = canvas.height
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     for (let state_id in animation_state_objects) {
         let state_object = animation_state_objects[state_id]
@@ -308,7 +300,6 @@ function evenly_space(animation_state_objects,canvas,ctx){
         x = 0
         y += max_frame_height
     }
-    console.log('drew even spacing')
     return output_data
 }
 
@@ -316,12 +307,13 @@ function output_data_to_animation_format(output_data){
     let output_txt = ""
     for(let animation_state_id in output_data){
         let animation_state = output_data[animation_state_id]
-        console.log(animation_state)
 
         let copies = [{state_name:animation_state.state_name,flip_x:false,flip_y:false,speed_multi:1}]
 
-        for(let clone_state of animation_state.clone_states){
-            copies.push(clone_state)
+        if(animation_state.clone_states){
+            for(let clone_state of animation_state.clone_states){
+                copies.push(clone_state)
+            }
         }
 
         for(let copy of copies){
@@ -334,7 +326,6 @@ function output_data_to_animation_format(output_data){
                 animation_state.frames.reverse()
             }
             for(let frame of animation_state.frames){
-                console.log("FRAME=",frame)
                 let frame_ref = frame
                 if(frame.duplicate_of){
                     frame_ref = frame.duplicate_of

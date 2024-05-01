@@ -3,6 +3,8 @@ import InputSheet from "./InputSheet.mjs"
 import AnimationState from "./AnimationState.mjs"
 import { create_and_append_element } from "./helpers.mjs"
 import export_modal from "./ExportModalSingleton.mjs"
+import ParseONBAnimation from "./ONBAnimationParser.mjs"
+import {replacement_pending} from "../globals.mjs"
 
 class ProjectMemoryManager{
     constructor(){
@@ -216,7 +218,6 @@ class ProjectMemoryManager{
         this.memory.input_sheets[initial_data.id] = initial_data
         this.PrepareInputSheet(initial_data)
         this.memory.next_input_sheet_id++
-        replacement_pending = false
     }
     NewAnimationState(){
         let initial_data = {

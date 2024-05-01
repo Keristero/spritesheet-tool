@@ -1,0 +1,1 @@
+export let replacement_pending = false
