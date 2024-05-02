@@ -1,7 +1,7 @@
 import DragDropZone from "./DragDropZone.mjs"
 import InputSheet from "./InputSheet.mjs"
 import AnimationState from "./AnimationState.mjs"
-import { create_and_append_element } from "./helpers.mjs"
+import { create_and_append_element, download_json_file } from "./helpers.mjs"
 import export_modal from "./ExportModalSingleton.mjs"
 import ParseONBAnimation from "./ONBAnimationParser.mjs"
 import {replacement_pending} from "../globals.mjs"
