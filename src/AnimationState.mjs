@@ -1,5 +1,5 @@
 import CanvasContainer from "./CanvasContainer.mjs"
-import { create_and_append_element,draw_frame_data } from "./helpers.mjs"
+import { create_and_append_element,draw_frame_data,swap_array_elements_left,swap_array_elements_right } from "./helpers.mjs"
 import FrameSelect from "./FrameSelect.mjs"
 
 class AnimationState extends CanvasContainer{
